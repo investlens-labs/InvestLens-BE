@@ -1,0 +1,21 @@
+spring:
+  datasource:
+    url: jdbc:h2:mem:investlens;MODE=PostgreSQL;DB_CLOSE_DELAY=-1;DATABASE_TO_LOWER=TRUE
+    username: sa
+    password:
+  flyway:
+    enabled: true
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+
+app:
+  jwt:
+    secret: test-secret-that-is-long-enough-for-hmac-validation
+    expiration-seconds: 3600
+  ai:
+    enabled: false
+  news-ingestion:
+    enabled: false
+    feeds: []
