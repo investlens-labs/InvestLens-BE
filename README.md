@@ -60,6 +60,24 @@ export JWT_SECRET='replace-with-at-least-32-random-bytes'
 - OpenAPI JSON: `http://localhost:8080/v3/api-docs`
 - Health: `http://localhost:8080/actuator/health`
 
+## Render 배포
+
+저장소의 `render.yaml` Blueprint는 무료 Render Web Service와 PostgreSQL 16을 함께 생성합니다.
+
+1. [Render Blueprint 생성 화면](https://dashboard.render.com/blueprints)에서 이 저장소를 연결합니다.
+2. `render.yaml`을 선택하고 생성되는 리소스를 확인한 뒤 배포합니다.
+3. 배포 완료 후 아래 주소로 상태와 API 명세를 확인합니다.
+
+```text
+https://<service-name>.onrender.com/actuator/health
+https://<service-name>.onrender.com/swagger-ui.html
+https://<service-name>.onrender.com/v3/api-docs
+```
+
+`JWT_SECRET`과 PostgreSQL 접속 정보는 Render가 생성하며 저장소에 저장되지 않습니다. 프론트엔드 배포 후에는 Render의 `CORS_ALLOWED_ORIGINS`에 실제 프론트엔드 주소를 추가해야 합니다.
+
+무료 Web Service는 유휴 상태에서 중지되어 첫 요청이 느릴 수 있고, 무료 PostgreSQL은 생성 후 30일이 지나면 만료됩니다. 장기 운영 전에는 유료 DB 또는 별도의 영구 DB로 전환하세요.
+
 ## API 요약
 
 | Method | Path | 설명 | 인증 |

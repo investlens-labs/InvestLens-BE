@@ -1,0 +1,13 @@
+.git
+.github
+.gradle
+.gradle-home
+.gradle-local
+.idea
+.omx
+build
+data
+out
+*.iml
+.DS_Store
+.env
