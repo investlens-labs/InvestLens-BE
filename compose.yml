@@ -1,0 +1,19 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: investlens
+      POSTGRES_USER: investlens
+      POSTGRES_PASSWORD: investlens
+    ports:
+      - "5432:5432"
+    volumes:
+      - investlens-postgres:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U investlens"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  investlens-postgres:
