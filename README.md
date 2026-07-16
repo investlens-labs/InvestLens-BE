@@ -64,6 +64,13 @@ export JWT_SECRET='replace-with-at-least-32-random-bytes'
 
 저장소의 `render.yaml` Blueprint는 무료 Render Web Service와 PostgreSQL 16을 함께 생성합니다.
 
+현재 개발 서버는 다음 주소에 배포되어 있습니다.
+
+- API Base URL: `https://investlens-be.onrender.com/api/v1`
+- Swagger UI: `https://investlens-be.onrender.com/swagger-ui.html`
+- OpenAPI JSON: `https://investlens-be.onrender.com/v3/api-docs`
+- Health: `https://investlens-be.onrender.com/actuator/health`
+
 1. [Render Blueprint 생성 화면](https://dashboard.render.com/blueprints)에서 이 저장소를 연결합니다.
 2. `render.yaml`을 선택하고 생성되는 리소스를 확인한 뒤 배포합니다.
 3. 배포 완료 후 아래 주소로 상태와 API 명세를 확인합니다.
