@@ -61,3 +61,10 @@ app:
     cron: ${NEWS_INGESTION_CRON:0 0/30 * * * *}
     timeout: 10s
     feeds: []
+  news-search:
+    enabled: ${NEWS_SEARCH_ENABLED:true}
+    base-url: ${NEWS_SEARCH_BASE_URL:https://news.google.com/rss/search}
+    timeout: ${NEWS_SEARCH_TIMEOUT:10s}
+    refresh-interval: ${NEWS_SEARCH_REFRESH_INTERVAL:30m}
+    lookback-days: ${NEWS_SEARCH_LOOKBACK_DAYS:90}
+    max-results: ${NEWS_SEARCH_MAX_RESULTS:20}

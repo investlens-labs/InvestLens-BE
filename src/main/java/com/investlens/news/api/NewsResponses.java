@@ -31,6 +31,7 @@ public final class NewsResponses {
     public record FeedItem(
             UUID id,
             String source,
+            String originalUrl,
             String title,
             String translatedTitle,
             String summary,
@@ -41,7 +42,8 @@ public final class NewsResponses {
     ) {
         public static FeedItem from(NewsArticle article, Set<UUID> allowedInstrumentIds,
                                     ImpactDirection direction, Integer minScore) {
-            return new FeedItem(article.getId(), article.getSource(), article.getTitle(), article.getTranslatedTitle(),
+            return new FeedItem(article.getId(), article.getSource(), article.getCanonicalUrl(),
+                    article.getTitle(), article.getTranslatedTitle(),
                     article.getSummary(), article.getMarketContext(), article.getAnalysisStatus(), article.getPublishedAt(),
                     article.getImpacts().stream()
                             .filter(impact -> allowedInstrumentIds.contains(impact.getInstrument().getId()))

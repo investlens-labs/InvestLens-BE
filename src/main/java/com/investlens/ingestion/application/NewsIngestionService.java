@@ -76,6 +76,27 @@ public class NewsIngestionService {
         return retryable.size();
     }
 
+    public int ingestForInstrument(Instrument instrument, List<CollectedNews> collectedNews) {
+        Map<String, Instrument> instrumentByTicker = Map.of(instrument.getTicker(), instrument);
+        Set<String> allowedTickers = instrumentByTicker.keySet();
+        int saved = 0;
+        for (CollectedNews collected : collectedNews) {
+            NewsArticle article = newsRepository.findByCanonicalUrl(collected.url()).orElse(null);
+            if (article != null && article.getAnalysisStatus() == AnalysisStatus.COMPLETED) continue;
+            if (article == null) {
+                try {
+                    article = persistenceService.createPending(collected, List.of(instrument));
+                    saved++;
+                } catch (DataIntegrityViolationException duplicateRace) {
+                    article = newsRepository.findByCanonicalUrl(collected.url()).orElse(null);
+                    if (article == null || article.getAnalysisStatus() == AnalysisStatus.COMPLETED) continue;
+                }
+            }
+            analyze(article, collected, allowedTickers, instrumentByTicker);
+        }
+        return saved;
+    }
+
     private void analyze(NewsArticle article, CollectedNews collected, Set<String> matched,
                            Map<String, Instrument> instruments) {
         try {

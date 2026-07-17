@@ -151,6 +151,10 @@ class ApiSmokeIntegrationTest {
         mockMvc.perform(get("/api/v1/instruments/{instrumentId}/chart", instrument.getId())
                         .header("Authorization", "Bearer " + token).param("range", "10Y"))
                 .andExpect(status().isBadRequest());
+        mockMvc.perform(get("/api/v1/instruments/{instrumentId}/news", instrument.getId())
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content").isArray());
         mockMvc.perform(get("/api/v1/news").header("Authorization", "Bearer " + token).param("minScore", "0"))
                 .andExpect(status().isBadRequest());
         mockMvc.perform(get("/api/v1/news").header("Authorization", "Bearer " + token).param("direction", "UNKNOWN"))
@@ -161,6 +165,7 @@ class ApiSmokeIntegrationTest {
                 .andExpect(jsonPath("$.paths['/api/v1/auth/signup']").exists())
                 .andExpect(jsonPath("$.paths['/api/v1/news']").exists())
                 .andExpect(jsonPath("$.paths['/api/v1/instruments/{instrumentId}/chart']").exists())
+                .andExpect(jsonPath("$.paths['/api/v1/instruments/{instrumentId}/news']").exists())
                 .andExpect(jsonPath("$.components.schemas.InstrumentResponse.properties.logoUrl").exists())
                 .andExpect(jsonPath("$.components.schemas.InstrumentResponse.properties.logoAttributionUrl").exists())
                 .andExpect(jsonPath("$.components.securitySchemes.bearerAuth").exists());

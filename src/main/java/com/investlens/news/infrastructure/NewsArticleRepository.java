@@ -25,6 +25,11 @@ public interface NewsArticleRepository extends JpaRepository<NewsArticle, UUID> 
                                @Param("minScore") Integer minScore,
                                Pageable pageable);
 
+    @Query("select n from NewsArticle n " +
+            "where exists (select r.id from NewsRelatedInstrument r " +
+            "where r.news = n and r.instrument.id = :instrumentId)")
+    Page<NewsArticle> findByInstrumentId(@Param("instrumentId") UUID instrumentId, Pageable pageable);
+
     @EntityGraph(attributePaths = {"impacts", "impacts.instrument"})
     @Query("select distinct n from NewsArticle n join n.relatedInstruments r where n.id = :id and r.instrument.id in :instrumentIds")
     Optional<NewsArticle> findDetailForInstruments(@Param("id") UUID id,

@@ -47,4 +47,11 @@ public class NewsQueryService {
                 .map(article -> NewsResponses.Detail.from(article, allowedIds))
                 .orElseThrow(() -> new BusinessException(ErrorCode.NEWS_NOT_FOUND));
     }
+
+    public Page<NewsResponses.FeedItem> getInstrumentNews(UUID instrumentId, int page, int size) {
+        var pageable = PageRequest.of(page, Math.min(size, 100),
+                Sort.by(Sort.Order.desc("publishedAt"), Sort.Order.desc("id")));
+        return newsRepository.findByInstrumentId(instrumentId, pageable)
+                .map(article -> NewsResponses.FeedItem.from(article, Set.of(instrumentId), null, null));
+    }
 }

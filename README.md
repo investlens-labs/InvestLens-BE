@@ -95,6 +95,7 @@ https://<service-name>.onrender.com/v3/api-docs
 | GET | `/api/v1/instruments` | 한·미 종목 검색 (`query`, `type`, `market`, `limit`) | Bearer |
 | GET | `/api/v1/instruments/{id}` | 종목 상세 | Bearer |
 | GET | `/api/v1/instruments/{id}/chart` | 기간별 가격·OHLCV 차트 (`range`) | Bearer |
+| GET | `/api/v1/instruments/{id}/news` | 종목 관련 기사 조회 및 과거 기사 초기 적재 | Bearer |
 | GET | `/api/v1/portfolio` | 내 포트폴리오 | Bearer |
 | POST | `/api/v1/portfolio` | 종목 등록 (`instrumentId`) | Bearer |
 | DELETE | `/api/v1/portfolio/{id}` | 종목 삭제 | Bearer |
@@ -144,6 +145,20 @@ GET /api/v1/instruments/{instrumentId}/chart?range=1M
 - `range`: `1D`, `1W`, `1M`, `3M`, `1Y`, `5Y`
 - 서버가 기간별 간격을 `5m`, `15m`, `1d`, `1wk` 중에서 자동 선택합니다.
 - 응답은 현재가, 전일 종가, 등락 금액·등락률, 통화, 시간대, 데이터 지연 시간과 OHLCV 포인트를 포함합니다.
+
+### 종목 관련 기사
+
+종목 상세 화면에서 아래 API를 처음 호출하면 Google News RSS 검색 결과에서 최근 90일 기사를 최대 20건 가져와
+중복 URL을 제거하고 해당 종목과 연결한 뒤 반환합니다. 같은 서버 인스턴스에서는 종목별로 30분 동안 외부 검색을
+반복하지 않습니다. 기사 본문 전체를 복제하지 않고 RSS가 제공하는 제목·발췌·원문 링크만 저장합니다.
+
+```http
+GET /api/v1/instruments/{instrumentId}/news?page=0&size=20
+```
+
+응답은 최신순 페이지이며 `originalUrl`, `title`, `summary`, `publishedAt`, `impacts`를 포함합니다.
+Google News RSS 검색은 무키 프로토타입 소스이므로 정식 상용 서비스 전에는 계약된 뉴스 공급자로
+`InstrumentNewsSourcePort` 구현을 교체하세요.
 
 ## Ollama 분석 활성화
 

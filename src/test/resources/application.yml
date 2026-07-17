@@ -25,3 +25,5 @@ app:
   news-ingestion:
     enabled: false
     feeds: []
+  news-search:
+    enabled: false

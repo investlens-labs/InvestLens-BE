@@ -19,7 +19,7 @@ class RssNewsSourceClientTest {
                 </item></channel></rss>
                 """;
         var properties = new RssFeedProperties(false, null, Duration.ofSeconds(1), List.of());
-        var client = new RssNewsSourceClient(properties, RestClient.builder());
+        var client = new RssNewsSourceClient(properties, RestClient.builder(), new RssNewsParser());
 
         var result = client.parse("Example", rss);
 
@@ -37,7 +37,8 @@ class RssNewsSourceClientTest {
                 <link>https://example.com</link></item></channel></rss>
                 """;
         var client = new RssNewsSourceClient(
-                new RssFeedProperties(false, null, Duration.ofSeconds(1), List.of()), RestClient.builder());
+                new RssFeedProperties(false, null, Duration.ofSeconds(1), List.of()),
+                RestClient.builder(), new RssNewsParser());
 
         assertThatThrownBy(() -> client.parse("malicious", malicious)).isInstanceOf(Exception.class);
     }
