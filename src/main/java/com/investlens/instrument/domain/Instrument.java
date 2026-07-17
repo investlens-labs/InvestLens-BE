@@ -28,13 +28,25 @@ public class Instrument extends BaseTimeEntity {
     @Column(nullable = false, length = 20)
     private InstrumentType type;
 
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 10)
+    private InstrumentMarket market;
+
+    @Column(nullable = false)
+    private boolean active = true;
+
     protected Instrument() {
     }
 
     public Instrument(String ticker, String companyName, InstrumentType type) {
+        this(ticker, companyName, type, InstrumentMarket.US);
+    }
+
+    public Instrument(String ticker, String companyName, InstrumentType type, InstrumentMarket market) {
         this.ticker = ticker;
         this.companyName = companyName;
         this.type = type;
+        this.market = market;
     }
 
     public UUID getId() {
@@ -51,5 +63,13 @@ public class Instrument extends BaseTimeEntity {
 
     public InstrumentType getType() {
         return type;
+    }
+
+    public InstrumentMarket getMarket() {
+        return market;
+    }
+
+    public boolean isActive() {
+        return active;
     }
 }

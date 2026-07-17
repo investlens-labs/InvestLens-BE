@@ -8,6 +8,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.investlens.instrument.domain.Instrument;
 import com.investlens.instrument.domain.InstrumentType;
+import com.investlens.instrument.domain.InstrumentMarket;
 import com.investlens.instrument.infrastructure.InstrumentRepository;
 import com.investlens.news.domain.ImpactDirection;
 import com.investlens.news.domain.NewsArticle;
@@ -134,7 +135,18 @@ class ApiSmokeIntegrationTest {
 
         mockMvc.perform(get("/api/v1/instruments").header("Authorization", "Bearer " + token)
                         .param("query", "NVIDIA"))
-                .andExpect(status().isOk()).andExpect(jsonPath("$[0].ticker").value("NVDA"));
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].ticker").value("NVDA"))
+                .andExpect(jsonPath("$[0].market").value("US"));
+        instrumentRepository.saveAndFlush(new Instrument("005930", "삼성전자", InstrumentType.STOCK, InstrumentMarket.KR));
+        mockMvc.perform(get("/api/v1/instruments").header("Authorization", "Bearer " + token)
+                        .param("query", "삼성").param("market", "KR"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].ticker").value("005930"))
+                .andExpect(jsonPath("$[0].market").value("KR"));
+        mockMvc.perform(get("/api/v1/instruments").header("Authorization", "Bearer " + token)
+                        .param("limit", "101"))
+                .andExpect(status().isBadRequest());
         mockMvc.perform(get("/api/v1/news").header("Authorization", "Bearer " + token).param("minScore", "0"))
                 .andExpect(status().isBadRequest());
         mockMvc.perform(get("/api/v1/news").header("Authorization", "Bearer " + token).param("direction", "UNKNOWN"))

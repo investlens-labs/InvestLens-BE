@@ -31,7 +31,7 @@ com.investlens
 ```
 
 - Controller는 Repository를 직접 호출하지 않습니다.
-- 외부 RSS와 AI는 포트 인터페이스 뒤에 격리했습니다.
+- 외부 종목 마스터, RSS와 AI는 포트 인터페이스 뒤에 격리했습니다.
 - AI 출력의 ticker, enum, score(1~5)를 서버에서 다시 검증합니다.
 - 사용자 소유권은 항상 사용자 UUID가 포함된 쿼리로 확인합니다.
 - 기사 전문 대신 RSS 발췌와 원문 URL을 중심으로 저장합니다.
@@ -92,7 +92,7 @@ https://<service-name>.onrender.com/v3/api-docs
 | POST | `/api/v1/auth/signup` | 회원가입 | 공개 |
 | POST | `/api/v1/auth/login` | JWT 로그인 | 공개 |
 | GET | `/api/v1/users/me` | 내 정보 | Bearer |
-| GET | `/api/v1/instruments` | 종목 검색 (`query`, `type`) | Bearer |
+| GET | `/api/v1/instruments` | 한·미 종목 검색 (`query`, `type`, `market`, `limit`) | Bearer |
 | GET | `/api/v1/instruments/{id}` | 종목 상세 | Bearer |
 | GET | `/api/v1/portfolio` | 내 포트폴리오 | Bearer |
 | POST | `/api/v1/portfolio` | 종목 등록 (`instrumentId`) | Bearer |
@@ -100,7 +100,26 @@ https://<service-name>.onrender.com/v3/api-docs
 | GET | `/api/v1/news` | 맞춤 뉴스 (`direction`, `minScore`, page) | Bearer |
 | GET | `/api/v1/news/{id}` | 번역·요약·영향 상세 | Bearer |
 
-초기 종목 마스터에는 NVDA, AAPL, MSFT, AMZN, GOOGL, META, TSLA, QQQ, VOO, SCHD, SMH가 포함됩니다.
+### 종목 검색
+
+백엔드는 서버 시작 시와 매일 오전 3시(Asia/Seoul)에 외부 종목 목록을 PostgreSQL로 동기화합니다.
+
+- 한국 개별 주식: KRX KIND 상장법인 목록
+- 한국 ETF: 네이버 금융 ETF API
+- 미국 주식·ETF: Nasdaq Trader의 Nasdaq Listed / Other Listed Symbol Directory
+
+외부 소스가 일시적으로 실패하거나 비정상적으로 적은 목록을 반환하면 기존 종목 마스터를 유지합니다.
+상장 목록에 없어진 종목은 비활성화하여 신규 검색 결과에서 제외하되 기존 포트폴리오 연결은 보존합니다.
+
+```http
+GET /api/v1/instruments?query=삼성&market=KR&type=STOCK&limit=20
+GET /api/v1/instruments?query=QQQ&market=US&type=ETF&limit=20
+```
+
+- `market`: `KR` 또는 `US`
+- `type`: `STOCK` 또는 `ETF`
+- `limit`: 기본 50, 최소 1, 최대 100
+- 응답 필드: `id`, `ticker`, `companyName`, `type`, `market`
 
 ## Ollama 분석 활성화
 

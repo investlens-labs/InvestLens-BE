@@ -33,6 +33,10 @@ springdoc:
     tags-sorter: alpha
 
 app:
+  instrument-catalog:
+    enabled: ${INSTRUMENT_CATALOG_ENABLED:true}
+    cron: ${INSTRUMENT_CATALOG_CRON:0 0 3 * * *}
+    timeout: ${INSTRUMENT_CATALOG_TIMEOUT:20s}
   cors:
     allowed-origins: ${CORS_ALLOWED_ORIGINS:http://localhost:5173}
   jwt:

@@ -11,6 +11,8 @@ spring:
     open-in-view: false
 
 app:
+  instrument-catalog:
+    enabled: false
   jwt:
     secret: test-secret-that-is-long-enough-for-hmac-validation
     expiration-seconds: 3600

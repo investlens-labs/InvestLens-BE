@@ -3,11 +3,13 @@ package com.investlens.instrument.application;
 import com.investlens.common.error.BusinessException;
 import com.investlens.common.error.ErrorCode;
 import com.investlens.instrument.domain.InstrumentType;
+import com.investlens.instrument.domain.InstrumentMarket;
 import com.investlens.instrument.infrastructure.InstrumentRepository;
 import com.investlens.instrument.presentation.dto.InstrumentResponse;
 import java.util.List;
 import java.util.UUID;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -19,9 +21,9 @@ public class InstrumentQueryService {
         this.instrumentRepository = instrumentRepository;
     }
 
-    public List<InstrumentResponse> search(String query, InstrumentType type) {
+    public List<InstrumentResponse> search(String query, InstrumentType type, InstrumentMarket market, int limit) {
         String normalizedQuery = query == null || query.isBlank() ? null : query.trim();
-        return instrumentRepository.search(normalizedQuery, type).stream()
+        return instrumentRepository.search(normalizedQuery, type, market, PageRequest.of(0, limit)).stream()
                 .map(InstrumentResponse::from)
                 .toList();
     }

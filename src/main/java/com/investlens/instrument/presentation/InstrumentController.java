@@ -2,6 +2,7 @@ package com.investlens.instrument.presentation;
 
 import com.investlens.instrument.application.InstrumentQueryService;
 import com.investlens.instrument.domain.InstrumentType;
+import com.investlens.instrument.domain.InstrumentMarket;
 import com.investlens.instrument.presentation.dto.InstrumentResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -9,12 +10,16 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import java.util.List;
 import java.util.UUID;
+import jakarta.validation.constraints.Max;
+import jakarta.validation.constraints.Min;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.validation.annotation.Validated;
 
+@Validated
 @RestController
 @RequestMapping("/api/v1/instruments")
 @Tag(name = "Instruments", description = "주식 및 ETF 종목 조회 API")
@@ -27,12 +32,15 @@ public class InstrumentController {
     }
 
     @GetMapping
-    @Operation(summary = "종목 검색", description = "티커 또는 종목명으로 주식과 ETF를 검색합니다.")
+    @Operation(summary = "종목 검색", description = "외부 데이터에서 동기화한 한국·미국 주식과 ETF를 검색합니다.")
     public List<InstrumentResponse> search(
             @Parameter(description = "티커 또는 종목명") @RequestParam(required = false) String query,
-            @Parameter(description = "종목 유형") @RequestParam(required = false) InstrumentType type
+            @Parameter(description = "종목 유형: STOCK 또는 ETF") @RequestParam(required = false) InstrumentType type,
+            @Parameter(description = "시장: KR 또는 US") @RequestParam(required = false) InstrumentMarket market,
+            @Parameter(description = "조회 개수 (최대 100)") @RequestParam(defaultValue = "50")
+            @Min(1) @Max(100) int limit
     ) {
-        return instrumentQueryService.search(query, type);
+        return instrumentQueryService.search(query, type, market, limit);
     }
 
     @GetMapping("/{instrumentId}")
