@@ -174,7 +174,7 @@ GET /api/v1/instruments/{instrumentId}/news?language=ko&page=0&size=20
 ```bash
 GEMINI_ENABLED=true
 GEMINI_API_KEY=<Google AI Studio API key>
-GEMINI_MODEL=gemini-2.5-flash
+GEMINI_MODEL=gemini-3.5-flash
 ```
 
 Google News RSS 검색은 무키 프로토타입 소스이므로 정식 상용 서비스 전에는 계약된 뉴스 공급자로

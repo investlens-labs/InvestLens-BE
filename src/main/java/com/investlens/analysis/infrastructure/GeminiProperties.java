@@ -16,7 +16,7 @@ public record GeminiProperties(
             baseUrl = "https://generativelanguage.googleapis.com";
         }
         if (model == null || model.isBlank()) {
-            model = "gemini-2.5-flash";
+            model = "gemini-3.5-flash";
         }
         if (timeout == null) {
             timeout = Duration.ofSeconds(60);
