@@ -120,7 +120,16 @@ GET /api/v1/instruments?query=QQQ&market=US&type=ETF&limit=20
 - `market`: `KR` 또는 `US`
 - `type`: `STOCK` 또는 `ETF`
 - `limit`: 기본 50, 최소 1, 최대 100
-- 응답 필드: `id`, `ticker`, `companyName`, `type`, `market`
+- 응답 필드: `id`, `ticker`, `companyName`, `type`, `market`, `logoUrl`, `logoAttributionUrl`
+
+### 종목 로고
+
+`LOGO_DEV_PUBLISHABLE_KEY`를 설정하면 종목 검색과 상세 응답에 Logo.dev CDN의 `logoUrl`을 포함합니다.
+미국 종목은 티커를 그대로 사용하고 한국 종목은 한국 거래소 suffix를 붙여 조회합니다. 로고가 없는 경우
+Logo.dev의 기본 모노그램 이미지가 반환되므로 프론트에서 깨진 이미지가 노출되지 않습니다.
+
+무료 플랜을 상업 서비스에서 사용하는 동안에는 `logoAttributionUrl`을 이용해 화면 하단 등에
+`Logos provided by Logo.dev` 링크를 표시해야 합니다. 키가 없거나 연동을 비활성화하면 두 필드는 `null`입니다.
 
 ### 종목 가격 차트
 

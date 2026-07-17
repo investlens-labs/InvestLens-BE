@@ -137,7 +137,8 @@ class ApiSmokeIntegrationTest {
                         .param("query", "NVIDIA"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].ticker").value("NVDA"))
-                .andExpect(jsonPath("$[0].market").value("US"));
+                .andExpect(jsonPath("$[0].market").value("US"))
+                .andExpect(jsonPath("$[0].logoUrl").doesNotExist());
         instrumentRepository.saveAndFlush(new Instrument("005930", "삼성전자", InstrumentType.STOCK, InstrumentMarket.KR));
         mockMvc.perform(get("/api/v1/instruments").header("Authorization", "Bearer " + token)
                         .param("query", "삼성").param("market", "KR"))
@@ -160,6 +161,8 @@ class ApiSmokeIntegrationTest {
                 .andExpect(jsonPath("$.paths['/api/v1/auth/signup']").exists())
                 .andExpect(jsonPath("$.paths['/api/v1/news']").exists())
                 .andExpect(jsonPath("$.paths['/api/v1/instruments/{instrumentId}/chart']").exists())
+                .andExpect(jsonPath("$.components.schemas.InstrumentResponse.properties.logoUrl").exists())
+                .andExpect(jsonPath("$.components.schemas.InstrumentResponse.properties.logoAttributionUrl").exists())
                 .andExpect(jsonPath("$.components.securitySchemes.bearerAuth").exists());
         mockMvc.perform(get("/swagger-ui.html")).andExpect(status().is3xxRedirection());
     }

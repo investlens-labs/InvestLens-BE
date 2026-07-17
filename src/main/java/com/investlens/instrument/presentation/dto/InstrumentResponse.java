@@ -12,15 +12,21 @@ public record InstrumentResponse(
         @Schema(example = "NVDA") String ticker,
         @Schema(example = "NVIDIA Corporation") String companyName,
         @Schema(example = "STOCK") InstrumentType type,
-        @Schema(example = "US") InstrumentMarket market
+        @Schema(example = "US") InstrumentMarket market,
+        @Schema(description = "종목 로고 이미지 URL. 설정되지 않은 경우 null", example = "https://img.logo.dev/ticker/NVDA?token=...")
+        String logoUrl,
+        @Schema(description = "무료 로고 사용 시 표시할 출처 링크", example = "https://logo.dev")
+        String logoAttributionUrl
 ) {
-    public static InstrumentResponse from(Instrument instrument) {
+    public static InstrumentResponse from(Instrument instrument, String logoUrl, String logoAttributionUrl) {
         return new InstrumentResponse(
                 instrument.getId(),
                 instrument.getTicker(),
                 instrument.getCompanyName(),
                 instrument.getType(),
-                instrument.getMarket()
+                instrument.getMarket(),
+                logoUrl,
+                logoUrl == null ? null : logoAttributionUrl
         );
     }
 }

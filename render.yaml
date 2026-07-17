@@ -29,6 +29,10 @@ services:
         value: false
       - key: NEWS_INGESTION_ENABLED
         value: false
+      - key: INSTRUMENT_LOGO_ENABLED
+        value: true
+      - key: LOGO_DEV_PUBLISHABLE_KEY
+        sync: false
       - key: JAVA_OPTS
         value: -XX:MaxRAMPercentage=75 -XX:+UseSerialGC
 

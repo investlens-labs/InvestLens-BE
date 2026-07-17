@@ -33,6 +33,11 @@ springdoc:
     tags-sorter: alpha
 
 app:
+  instrument-logo:
+    enabled: ${INSTRUMENT_LOGO_ENABLED:true}
+    base-url: ${INSTRUMENT_LOGO_BASE_URL:https://img.logo.dev}
+    publishable-key: ${LOGO_DEV_PUBLISHABLE_KEY:}
+    size: ${INSTRUMENT_LOGO_SIZE:64}
   market-data:
     enabled: ${MARKET_DATA_ENABLED:true}
     base-url: ${MARKET_DATA_BASE_URL:https://query1.finance.yahoo.com}
