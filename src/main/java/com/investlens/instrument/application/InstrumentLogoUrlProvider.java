@@ -21,13 +21,13 @@ public class InstrumentLogoUrlProvider {
     public String get(Instrument instrument) {
         if (!properties.enabled() || properties.publishableKey().isBlank()) return null;
 
-        String symbol = instrument.getMarket() == InstrumentMarket.KR
-                ? instrument.getTicker() + ".KQ"
-                : instrument.getTicker();
-        String encodedSymbol = URLEncoder.encode(symbol, StandardCharsets.UTF_8).replace("+", "%20");
+        boolean koreanMarket = instrument.getMarket() == InstrumentMarket.KR;
+        String lookupType = koreanMarket ? "name" : "ticker";
+        String lookupValue = koreanMarket ? instrument.getCompanyName() : instrument.getTicker();
+        String encodedValue = URLEncoder.encode(lookupValue, StandardCharsets.UTF_8).replace("+", "%20");
 
         return UriComponentsBuilder.fromUriString(properties.baseUrl())
-                .pathSegment("ticker", encodedSymbol)
+                .pathSegment(lookupType, encodedValue)
                 .queryParam("token", properties.publishableKey())
                 .queryParam("size", properties.size())
                 .queryParam("format", "png")

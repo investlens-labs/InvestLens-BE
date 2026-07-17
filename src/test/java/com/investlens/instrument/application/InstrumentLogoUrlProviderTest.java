@@ -22,13 +22,13 @@ class InstrumentLogoUrlProviderTest {
     }
 
     @Test
-    void addsKoreanExchangeSuffix() {
+    void usesCompanyNameForKoreanInstrument() {
         var provider = new InstrumentLogoUrlProvider(properties(true, "pk_test"));
 
         String logoUrl = provider.get(new Instrument(
                 "005930", "삼성전자", InstrumentType.STOCK, InstrumentMarket.KR));
 
-        assertThat(logoUrl).startsWith("https://img.logo.dev/ticker/005930.KQ?");
+        assertThat(logoUrl).startsWith("https://img.logo.dev/name/%EC%82%BC%EC%84%B1%EC%A0%84%EC%9E%90?");
     }
 
     @Test

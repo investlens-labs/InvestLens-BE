@@ -125,7 +125,7 @@ GET /api/v1/instruments?query=QQQ&market=US&type=ETF&limit=20
 ### 종목 로고
 
 `LOGO_DEV_PUBLISHABLE_KEY`를 설정하면 종목 검색과 상세 응답에 Logo.dev CDN의 `logoUrl`을 포함합니다.
-미국 종목은 티커를 그대로 사용하고 한국 종목은 한국 거래소 suffix를 붙여 조회합니다. 로고가 없는 경우
+미국 종목은 티커로 조회하고 한국 종목은 코스피·코스닥 suffix 오분류를 피하기 위해 회사명으로 조회합니다. 로고가 없는 경우
 Logo.dev의 기본 모노그램 이미지가 반환되므로 프론트에서 깨진 이미지가 노출되지 않습니다.
 
 무료 플랜을 상업 서비스에서 사용하는 동안에는 `logoAttributionUrl`을 이용해 화면 하단 등에
