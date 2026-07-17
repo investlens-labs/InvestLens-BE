@@ -170,6 +170,10 @@ class ApiSmokeIntegrationTest {
                 .andExpect(jsonPath("$[0].ticker").value("NVDA"))
                 .andExpect(jsonPath("$[0].market").value("US"))
                 .andExpect(jsonPath("$[0].logoUrl").doesNotExist());
+        mockMvc.perform(get("/api/v1/instruments").header("Authorization", "Bearer " + token)
+                        .param("limit", "50"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isArray());
         instrumentRepository.saveAndFlush(new Instrument("005930", "삼성전자", InstrumentType.STOCK, InstrumentMarket.KR));
         mockMvc.perform(get("/api/v1/instruments").header("Authorization", "Bearer " + token)
                         .param("query", "삼성").param("market", "KR"))

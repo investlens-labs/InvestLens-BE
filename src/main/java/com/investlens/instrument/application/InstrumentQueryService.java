@@ -26,7 +26,7 @@ public class InstrumentQueryService {
     }
 
     public List<InstrumentResponse> search(String query, InstrumentType type, InstrumentMarket market, int limit) {
-        String normalizedQuery = query == null || query.isBlank() ? null : query.trim();
+        String normalizedQuery = query == null || query.isBlank() ? "" : query.trim();
         return instrumentRepository.search(normalizedQuery, type, market, PageRequest.of(0, limit)).stream()
                 .map(this::toResponse)
                 .toList();

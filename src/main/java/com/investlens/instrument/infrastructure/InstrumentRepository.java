@@ -15,14 +15,14 @@ public interface InstrumentRepository extends JpaRepository<Instrument, UUID> {
     Optional<Instrument> findByTicker(String ticker);
     @Query("""
             select i from Instrument i
-            where (:query is null
+            where (:query = ''
                 or lower(i.ticker) like lower(concat('%', :query, '%'))
                 or lower(i.companyName) like lower(concat('%', :query, '%')))
               and (:type is null or i.type = :type)
               and (:market is null or i.market = :market)
               and i.active = true
             order by
-              case when :query is not null and lower(i.ticker) = lower(:query) then 0 else 1 end,
+              case when :query <> '' and lower(i.ticker) = lower(:query) then 0 else 1 end,
               i.ticker asc
             """)
     List<Instrument> search(@Param("query") String query, @Param("type") InstrumentType type,
