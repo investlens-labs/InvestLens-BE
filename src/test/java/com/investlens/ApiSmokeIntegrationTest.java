@@ -113,6 +113,26 @@ class ApiSmokeIntegrationTest {
                 .andExpect(jsonPath("$.impacts.length()").value(1))
                 .andExpect(jsonPath("$.impacts[0].ticker").value("NVDA"));
 
+        NewsArticle olderArticle = new NewsArticle("Test", "https://example.test/older", "Older NVIDIA news",
+                "Original", Instant.parse("2020-01-01T00:00:00Z"));
+        olderArticle.relateTo(List.of(instrument));
+        olderArticle.completeAnalysis("과거 기사", "본문", "요약", "맥락", "test-model",
+                List.of(new NewsImpact(instrument, ImpactDirection.NEUTRAL, 1, "과거")));
+        NewsArticle newestArticle = new NewsArticle("Test", "https://example.test/newest", "Newest NVIDIA news",
+                "Original", Instant.parse("2030-01-01T00:00:00Z"));
+        newestArticle.relateTo(List.of(instrument));
+        newestArticle.completeAnalysis("최신 기사", "본문", "요약", "맥락", "test-model",
+                List.of(new NewsImpact(instrument, ImpactDirection.POSITIVE, 3, "최신")));
+        newsRepository.saveAllAndFlush(List.of(olderArticle, newestArticle));
+
+        mockMvc.perform(get("/api/v1/instruments/{instrumentId}/news", instrument.getId())
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].title").value("Newest NVIDIA news"));
+        mockMvc.perform(get("/api/v1/news").header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].title").value("Newest NVIDIA news"));
+
         NewsArticle privateArticle = new NewsArticle("Test", "https://example.test/private", "NVIDIA only",
                 "Original", Instant.now());
         privateArticle.relateTo(List.of(instrument));

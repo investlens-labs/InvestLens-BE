@@ -33,7 +33,8 @@ public class InstrumentNewsController {
 
     @GetMapping
     @Operation(summary = "종목 관련 뉴스 조회",
-            description = "과거 관련 기사를 적재하고 선택 언어로 번역한 제목과 2~3문장 요약, 원문 링크를 반환합니다.")
+            description = "과거 관련 기사를 적재하고 발행일 최신순으로 정렬해 선택 언어의 번역 제목, "
+                    + "2~3문장 요약, 원문 링크를 반환합니다.")
     public Page<NewsResponses.FeedItem> get(
             @PathVariable UUID instrumentId,
             @RequestParam(defaultValue = "ko") String language,
