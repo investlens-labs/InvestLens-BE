@@ -94,6 +94,7 @@ https://<service-name>.onrender.com/v3/api-docs
 | GET | `/api/v1/users/me` | 내 정보 | Bearer |
 | GET | `/api/v1/instruments` | 한·미 종목 검색 (`query`, `type`, `market`, `limit`) | Bearer |
 | GET | `/api/v1/instruments/{id}` | 종목 상세 | Bearer |
+| GET | `/api/v1/instruments/{id}/chart` | 기간별 가격·OHLCV 차트 (`range`) | Bearer |
 | GET | `/api/v1/portfolio` | 내 포트폴리오 | Bearer |
 | POST | `/api/v1/portfolio` | 종목 등록 (`instrumentId`) | Bearer |
 | DELETE | `/api/v1/portfolio/{id}` | 종목 삭제 | Bearer |
@@ -120,6 +121,20 @@ GET /api/v1/instruments?query=QQQ&market=US&type=ETF&limit=20
 - `type`: `STOCK` 또는 `ETF`
 - `limit`: 기본 50, 최소 1, 최대 100
 - 응답 필드: `id`, `ticker`, `companyName`, `type`, `market`
+
+### 종목 가격 차트
+
+종목 상세 차트는 외부 시장 데이터 어댑터를 통해 한국·미국 주식과 ETF의 가격 이력을 제공합니다.
+현재 무키 연동 소스를 사용하며, 외부 호출 제한과 장애가 API 전체로 전파되지 않도록 기간별로 30초~1시간 캐시합니다.
+정식 서비스 전에는 이용 목적에 맞는 라이선스 시세 공급자로 `InstrumentChartSourcePort` 구현을 교체하세요.
+
+```http
+GET /api/v1/instruments/{instrumentId}/chart?range=1M
+```
+
+- `range`: `1D`, `1W`, `1M`, `3M`, `1Y`, `5Y`
+- 서버가 기간별 간격을 `5m`, `15m`, `1d`, `1wk` 중에서 자동 선택합니다.
+- 응답은 현재가, 전일 종가, 등락 금액·등락률, 통화, 시간대, 데이터 지연 시간과 OHLCV 포인트를 포함합니다.
 
 ## Ollama 분석 활성화
 

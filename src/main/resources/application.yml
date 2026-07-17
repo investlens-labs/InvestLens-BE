@@ -33,6 +33,10 @@ springdoc:
     tags-sorter: alpha
 
 app:
+  market-data:
+    enabled: ${MARKET_DATA_ENABLED:true}
+    base-url: ${MARKET_DATA_BASE_URL:https://query1.finance.yahoo.com}
+    timeout: ${MARKET_DATA_TIMEOUT:10s}
   instrument-catalog:
     enabled: ${INSTRUMENT_CATALOG_ENABLED:true}
     cron: ${INSTRUMENT_CATALOG_CRON:0 0 3 * * *}

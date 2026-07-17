@@ -1,9 +1,11 @@
 package com.investlens.instrument.presentation;
 
 import com.investlens.instrument.application.InstrumentQueryService;
+import com.investlens.instrument.application.InstrumentChartService;
 import com.investlens.instrument.domain.InstrumentType;
 import com.investlens.instrument.domain.InstrumentMarket;
 import com.investlens.instrument.presentation.dto.InstrumentResponse;
+import com.investlens.instrument.presentation.dto.InstrumentChartResponse;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -26,9 +28,12 @@ import org.springframework.validation.annotation.Validated;
 @SecurityRequirement(name = "bearerAuth")
 public class InstrumentController {
     private final InstrumentQueryService instrumentQueryService;
+    private final InstrumentChartService instrumentChartService;
 
-    public InstrumentController(InstrumentQueryService instrumentQueryService) {
+    public InstrumentController(InstrumentQueryService instrumentQueryService,
+                                InstrumentChartService instrumentChartService) {
         this.instrumentQueryService = instrumentQueryService;
+        this.instrumentChartService = instrumentChartService;
     }
 
     @GetMapping
@@ -47,5 +52,16 @@ public class InstrumentController {
     @Operation(summary = "종목 상세 조회")
     public InstrumentResponse get(@PathVariable UUID instrumentId) {
         return instrumentQueryService.get(instrumentId);
+    }
+
+    @GetMapping("/{instrumentId}/chart")
+    @Operation(summary = "종목 가격 차트 조회", description = "한국·미국 주식과 ETF의 기간별 OHLCV 데이터를 조회합니다.")
+    public InstrumentChartResponse chart(
+            @PathVariable UUID instrumentId,
+            @Parameter(description = "차트 기간", schema = @io.swagger.v3.oas.annotations.media.Schema(
+                    allowableValues = {"1D", "1W", "1M", "3M", "1Y", "5Y"}))
+            @RequestParam(defaultValue = "1M") String range
+    ) {
+        return instrumentChartService.get(instrumentId, range);
     }
 }
