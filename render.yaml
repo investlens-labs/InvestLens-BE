@@ -24,7 +24,7 @@ services:
       - key: JWT_SECRET
         generateValue: true
       - key: CORS_ALLOWED_ORIGINS
-        value: http://localhost:5173
+        value: http://localhost:5173,https://investlens.mandoo4137-a53.workers.dev
       - key: OLLAMA_ENABLED
         value: false
       - key: GEMINI_ENABLED
