@@ -56,6 +56,12 @@ app:
     base-url: ${OLLAMA_BASE_URL:http://localhost:11434}
     model: ${OLLAMA_MODEL:gemma3:4b}
     timeout: 60s
+  gemini:
+    enabled: ${GEMINI_ENABLED:false}
+    base-url: ${GEMINI_BASE_URL:https://generativelanguage.googleapis.com}
+    api-key: ${GEMINI_API_KEY:}
+    model: ${GEMINI_MODEL:gemini-2.5-flash}
+    timeout: ${GEMINI_TIMEOUT:60s}
   news-ingestion:
     enabled: ${NEWS_INGESTION_ENABLED:false}
     cron: ${NEWS_INGESTION_CRON:0 0/30 * * * *}

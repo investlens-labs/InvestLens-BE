@@ -4,7 +4,9 @@ import com.investlens.common.error.BusinessException;
 import com.investlens.common.error.ErrorCode;
 import com.investlens.news.api.NewsResponses;
 import com.investlens.news.domain.ImpactDirection;
+import com.investlens.news.domain.NewsLanguage;
 import com.investlens.news.infrastructure.NewsArticleRepository;
+import com.investlens.instrument.infrastructure.InstrumentRepository;
 import com.investlens.portfolio.application.PortfolioInstrumentQueryService;
 import java.util.List;
 import java.util.UUID;
@@ -21,10 +23,17 @@ import org.springframework.transaction.annotation.Transactional;
 public class NewsQueryService {
     private final NewsArticleRepository newsRepository;
     private final PortfolioInstrumentQueryService portfolioQueryService;
+    private final NewsLocalizationService localizationService;
+    private final InstrumentRepository instrumentRepository;
 
-    public NewsQueryService(NewsArticleRepository newsRepository, PortfolioInstrumentQueryService portfolioQueryService) {
+    public NewsQueryService(NewsArticleRepository newsRepository,
+                            PortfolioInstrumentQueryService portfolioQueryService,
+                            NewsLocalizationService localizationService,
+                            InstrumentRepository instrumentRepository) {
         this.newsRepository = newsRepository;
         this.portfolioQueryService = portfolioQueryService;
+        this.localizationService = localizationService;
+        this.instrumentRepository = instrumentRepository;
     }
 
     public Page<NewsResponses.FeedItem> getFeed(UUID userId, ImpactDirection direction, Integer minScore, int page, int size) {
@@ -48,10 +57,15 @@ public class NewsQueryService {
                 .orElseThrow(() -> new BusinessException(ErrorCode.NEWS_NOT_FOUND));
     }
 
-    public Page<NewsResponses.FeedItem> getInstrumentNews(UUID instrumentId, int page, int size) {
+    public Page<NewsResponses.FeedItem> getInstrumentNews(UUID instrumentId, String languageCode, int page, int size) {
+        NewsLanguage language = NewsLanguage.fromCode(languageCode);
+        var instrument = instrumentRepository.findById(instrumentId)
+                .orElseThrow(() -> new BusinessException(ErrorCode.INSTRUMENT_NOT_FOUND));
         var pageable = PageRequest.of(page, Math.min(size, 100),
                 Sort.by(Sort.Order.desc("publishedAt"), Sort.Order.desc("id")));
-        return newsRepository.findByInstrumentId(instrumentId, pageable)
-                .map(article -> NewsResponses.FeedItem.from(article, Set.of(instrumentId), null, null));
+        var articles = newsRepository.findByInstrumentId(instrumentId, pageable);
+        var localizations = localizationService.localize(articles.getContent(), language, instrument);
+        return articles.map(article -> NewsResponses.FeedItem.localized(
+                article, Set.of(instrumentId), localizations.get(article.getId())));
     }
 }

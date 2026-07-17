@@ -93,6 +93,17 @@ class ApiSmokeIntegrationTest {
                 List.of(new NewsImpact(instrument, ImpactDirection.POSITIVE, 5, "수요 증가"),
                         new NewsImpact(apple, ImpactDirection.NEGATIVE, 2, "경쟁 심화")));
         newsRepository.saveAndFlush(article);
+        mockMvc.perform(get("/api/v1/instruments/{instrumentId}/news", instrument.getId())
+                        .header("Authorization", "Bearer " + token)
+                        .param("language", "ko"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.content[0].originalUrl").value("https://example.test/shared"))
+                .andExpect(jsonPath("$.content[0].title").value("NVIDIA and Apple news"))
+                .andExpect(jsonPath("$.content[0].translatedTitle").isNotEmpty())
+                .andExpect(jsonPath("$.content[0].summary").isNotEmpty())
+                .andExpect(jsonPath("$.content[0].language").value("ko"))
+                .andExpect(jsonPath("$.content[0].localized").value(false))
+                .andExpect(jsonPath("$.content[0].impacts[0].aiAnalyzed").value(false));
         mockMvc.perform(get("/api/v1/news").header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content[0].impacts.length()").value(1))
@@ -155,6 +166,10 @@ class ApiSmokeIntegrationTest {
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray());
+        mockMvc.perform(get("/api/v1/instruments/{instrumentId}/news", instrument.getId())
+                        .header("Authorization", "Bearer " + token)
+                        .param("language", "fr"))
+                .andExpect(status().isBadRequest());
         mockMvc.perform(get("/api/v1/news").header("Authorization", "Bearer " + token).param("minScore", "0"))
                 .andExpect(status().isBadRequest());
         mockMvc.perform(get("/api/v1/news").header("Authorization", "Bearer " + token).param("direction", "UNKNOWN"))

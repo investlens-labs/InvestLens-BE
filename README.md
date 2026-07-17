@@ -153,10 +153,30 @@ GET /api/v1/instruments/{instrumentId}/chart?range=1M
 반복하지 않습니다. 기사 본문 전체를 복제하지 않고 RSS가 제공하는 제목·발췌·원문 링크만 저장합니다.
 
 ```http
-GET /api/v1/instruments/{instrumentId}/news?page=0&size=20
+GET /api/v1/instruments/{instrumentId}/news?language=ko&page=0&size=20
 ```
 
-응답은 최신순 페이지이며 `originalUrl`, `title`, `summary`, `publishedAt`, `impacts`를 포함합니다.
+`language`은 `ko`, `en`, `ja`, `zh`를 지원합니다. Gemini가 활성화되어 있으면 언어별 번역 제목과
+2~3문장 요약을 생성하고 DB에 캐시합니다. 응답은 최신순 페이지이며 `originalUrl`, `title`,
+`translatedTitle`, `summary`, `language`, `localized`, `publishedAt`, `impacts`를 포함합니다.
+`title`과 `originalUrl`은 항상 원문 정보이며 `localized=false`이면 AI 번역이 일시적으로 제공되지 않은 상태입니다.
+각 `impacts` 항목의 `aiAnalyzed`가 `true`일 때만 `direction`, `score`, `reason`이 Gemini의 실제 평가입니다.
+`false`이면 `NEUTRAL + 1점` fallback이며 `analysisModel`은 비어 있습니다.
+
+영향 점수 기준은 다음과 같습니다.
+
+- `1`: 단순 언급 또는 실질 영향 근거가 거의 없음
+- `2`: 간접적이거나 제한적인 낮은 영향
+- `3`: 영업·수요·비용·규제·재무에 명확하고 의미 있는 영향
+- `4`: 주요 사업 또는 재무 결과에 직접적이고 중대한 영향
+- `5`: 전사적·존립적이거나 즉각적으로 매우 중대한 사건
+
+```bash
+GEMINI_ENABLED=true
+GEMINI_API_KEY=<Google AI Studio API key>
+GEMINI_MODEL=gemini-2.5-flash
+```
+
 Google News RSS 검색은 무키 프로토타입 소스이므로 정식 상용 서비스 전에는 계약된 뉴스 공급자로
 `InstrumentNewsSourcePort` 구현을 교체하세요.
 

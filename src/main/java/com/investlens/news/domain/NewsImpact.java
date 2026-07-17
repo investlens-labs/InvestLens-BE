@@ -31,6 +31,10 @@ public class NewsImpact {
     private int score;
     @Column(nullable = false, columnDefinition = "text")
     private String reason;
+    @Column(name = "ai_analyzed", nullable = false)
+    private boolean aiAnalyzed;
+    @Column(name = "analysis_model", length = 100)
+    private String analysisModel;
 
     protected NewsImpact() {}
 
@@ -44,6 +48,19 @@ public class NewsImpact {
         this.direction = direction;
         this.score = score;
         this.reason = reason.strip();
+        this.aiAnalyzed = false;
+    }
+
+    public void updateAiAssessment(ImpactDirection direction, int score, String reason, String modelName) {
+        if (direction == null) throw new IllegalArgumentException("direction must not be null");
+        if (score < 1 || score > 5) throw new IllegalArgumentException("score must be between 1 and 5");
+        if (reason == null || reason.isBlank()) throw new IllegalArgumentException("reason must not be blank");
+        if (modelName == null || modelName.isBlank()) throw new IllegalArgumentException("modelName must not be blank");
+        this.direction = direction;
+        this.score = score;
+        this.reason = reason.strip();
+        this.aiAnalyzed = true;
+        this.analysisModel = modelName.strip();
     }
 
     void attachTo(NewsArticle news) { this.news = news; }
@@ -52,4 +69,6 @@ public class NewsImpact {
     public ImpactDirection getDirection() { return direction; }
     public int getScore() { return score; }
     public String getReason() { return reason; }
+    public boolean isAiAnalyzed() { return aiAnalyzed; }
+    public String getAnalysisModel() { return analysisModel; }
 }

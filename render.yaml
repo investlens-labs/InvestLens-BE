@@ -27,6 +27,12 @@ services:
         value: http://localhost:5173
       - key: OLLAMA_ENABLED
         value: false
+      - key: GEMINI_ENABLED
+        value: false
+      - key: GEMINI_API_KEY
+        sync: false
+      - key: GEMINI_MODEL
+        value: gemini-2.5-flash
       - key: NEWS_INGESTION_ENABLED
         value: false
       - key: NEWS_SEARCH_ENABLED

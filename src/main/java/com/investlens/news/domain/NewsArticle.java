@@ -99,6 +99,15 @@ public class NewsArticle extends BaseTimeEntity {
         this.analysisError = error == null ? "Unknown analysis error" : error.substring(0, Math.min(error.length(), 1000));
     }
 
+    public void updateImpactAssessment(UUID instrumentId, com.investlens.news.domain.ImpactDirection direction,
+                                       int score, String reason, String modelName) {
+        NewsImpact impact = impacts.stream()
+                .filter(item -> item.getInstrument().getId().equals(instrumentId))
+                .findFirst()
+                .orElseThrow(() -> new IllegalArgumentException("Related impact was not found"));
+        impact.updateAiAssessment(direction, score, reason, modelName);
+    }
+
     private static String requireText(String value, String field) {
         if (value == null || value.isBlank()) throw new IllegalArgumentException(field + " must not be blank");
         return value.strip();

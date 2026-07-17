@@ -33,12 +33,13 @@ public class InstrumentNewsController {
 
     @GetMapping
     @Operation(summary = "종목 관련 뉴스 조회",
-            description = "최근 저장된 관련 기사를 반환하고 필요하면 외부 뉴스 검색에서 과거 기사를 먼저 적재합니다.")
+            description = "과거 관련 기사를 적재하고 선택 언어로 번역한 제목과 2~3문장 요약, 원문 링크를 반환합니다.")
     public Page<NewsResponses.FeedItem> get(
             @PathVariable UUID instrumentId,
+            @RequestParam(defaultValue = "ko") String language,
             @RequestParam(defaultValue = "0") @Min(0) int page,
             @RequestParam(defaultValue = "20") @Min(1) @Max(100) int size) {
         backfillService.refreshIfNeeded(instrumentId);
-        return newsQueryService.getInstrumentNews(instrumentId, page, size);
+        return newsQueryService.getInstrumentNews(instrumentId, language, page, size);
     }
 }

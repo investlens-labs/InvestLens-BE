@@ -4,6 +4,7 @@ import com.investlens.news.domain.AnalysisStatus;
 import com.investlens.news.domain.ImpactDirection;
 import com.investlens.news.domain.NewsArticle;
 import com.investlens.news.domain.NewsImpact;
+import com.investlens.news.application.NewsLocalizationService;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -19,12 +20,22 @@ public final class NewsResponses {
             String instrumentType,
             ImpactDirection direction,
             int score,
-            String reason
+            String reason,
+            boolean aiAnalyzed,
+            String analysisModel
     ) {
         static Impact from(NewsImpact impact) {
             var instrument = impact.getInstrument();
             return new Impact(instrument.getId(), instrument.getTicker(), instrument.getCompanyName(),
-                    instrument.getType().name(), impact.getDirection(), impact.getScore(), impact.getReason());
+                    instrument.getType().name(), impact.getDirection(), impact.getScore(), impact.getReason(),
+                    impact.isAiAnalyzed(), impact.getAnalysisModel());
+        }
+
+        static Impact localized(NewsImpact impact, NewsLocalizationService.LocalizedView localization) {
+            var instrument = impact.getInstrument();
+            return new Impact(instrument.getId(), instrument.getTicker(), instrument.getCompanyName(),
+                    instrument.getType().name(), localization.direction(), localization.score(),
+                    localization.reason(), localization.localized(), localization.modelName());
         }
     }
 
@@ -35,6 +46,9 @@ public final class NewsResponses {
             String title,
             String translatedTitle,
             String summary,
+            String language,
+            boolean localized,
+            String localizationModel,
             String marketContext,
             AnalysisStatus analysisStatus,
             Instant publishedAt,
@@ -44,12 +58,26 @@ public final class NewsResponses {
                                     ImpactDirection direction, Integer minScore) {
             return new FeedItem(article.getId(), article.getSource(), article.getCanonicalUrl(),
                     article.getTitle(), article.getTranslatedTitle(),
-                    article.getSummary(), article.getMarketContext(), article.getAnalysisStatus(), article.getPublishedAt(),
+                    article.getSummary(), null, article.getTranslatedTitle() != null, article.getModelName(),
+                    article.getMarketContext(), article.getAnalysisStatus(), article.getPublishedAt(),
                     article.getImpacts().stream()
                             .filter(impact -> allowedInstrumentIds.contains(impact.getInstrument().getId()))
                             .filter(impact -> direction == null || impact.getDirection() == direction)
                             .filter(impact -> minScore == null || impact.getScore() >= minScore)
                             .map(Impact::from).toList());
+        }
+
+        public static FeedItem localized(NewsArticle article,
+                                         Set<UUID> allowedInstrumentIds,
+                                         NewsLocalizationService.LocalizedView localization) {
+            return new FeedItem(article.getId(), article.getSource(), article.getCanonicalUrl(),
+                    article.getTitle(), localization.translatedTitle(), localization.summary(),
+                    localization.language(), localization.localized(), localization.modelName(),
+                    article.getMarketContext(), article.getAnalysisStatus(), article.getPublishedAt(),
+                    article.getImpacts().stream()
+                            .filter(impact -> allowedInstrumentIds.contains(impact.getInstrument().getId()))
+                            .map(impact -> Impact.localized(impact, localization))
+                            .toList());
         }
     }
 
