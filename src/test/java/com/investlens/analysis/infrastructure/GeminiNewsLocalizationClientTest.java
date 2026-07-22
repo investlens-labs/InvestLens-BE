@@ -43,7 +43,7 @@ class GeminiNewsLocalizationClientTest {
                 "translatedTitle", "번역 제목",
                 "summary", "첫 문장입니다. 두 번째 문장입니다.",
                 "direction", "POSITIVE",
-                "score", 3,
+                "score", 10,
                 "reason", "수요 증가 가능성이 명시됐습니다.",
                 "upProbability", 65,
                 "downProbability", 10,
@@ -67,7 +67,7 @@ class GeminiNewsLocalizationClientTest {
             assertThat(item.translatedTitle()).isEqualTo("번역 제목");
             assertThat(item.summary()).contains("첫 문장");
             assertThat(item.direction()).isEqualTo(com.investlens.news.domain.ImpactDirection.POSITIVE);
-            assertThat(item.score()).isEqualTo(3);
+            assertThat(item.score()).isEqualTo(10);
             assertThat(item.upProbability()).isEqualTo(65);
             assertThat(item.downProbability()).isEqualTo(10);
             assertThat(item.neutralProbability()).isEqualTo(25);

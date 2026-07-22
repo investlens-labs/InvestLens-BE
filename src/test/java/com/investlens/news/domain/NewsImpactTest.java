@@ -12,13 +12,13 @@ class NewsImpactTest {
     private final Instrument instrument = new Instrument("NVDA", "NVIDIA", InstrumentType.STOCK);
 
     @ParameterizedTest
-    @ValueSource(ints = {1, 2, 3, 4, 5})
+    @ValueSource(ints = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10})
     void acceptsScoreFromOneToFive(int score) {
         new NewsImpact(instrument, ImpactDirection.POSITIVE, score, "관련 수요 증가 가능성");
     }
 
     @ParameterizedTest
-    @ValueSource(ints = {-1, 0, 6})
+    @ValueSource(ints = {-1, 0, 11})
     void rejectsOutOfRangeScore(int score) {
         assertThatThrownBy(() -> new NewsImpact(instrument, ImpactDirection.NEGATIVE, score, "영향"))
                 .isInstanceOf(IllegalArgumentException.class);

@@ -37,8 +37,8 @@ public class NewsQueryService {
     }
 
     public Page<NewsResponses.FeedItem> getFeed(UUID userId, ImpactDirection direction, Integer minScore, int page, int size) {
-        if (minScore != null && (minScore < 1 || minScore > 5)) {
-            throw new BusinessException(ErrorCode.INVALID_REQUEST, "minScore는 1 이상 5 이하여야 합니다.");
+        if (minScore != null && (minScore < 1 || minScore > 10)) {
+            throw new BusinessException(ErrorCode.INVALID_REQUEST, "minScore는 1 이상 10 이하여야 합니다.");
         }
         List<UUID> instrumentIds = portfolioQueryService.findInstrumentIds(userId);
         var pageable = PageRequest.of(page, Math.min(size, 100), Sort.by(Sort.Order.desc("publishedAt"), Sort.Order.desc("id")));

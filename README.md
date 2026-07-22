@@ -33,7 +33,7 @@ com.investlens
 
 - Controller는 Repository를 직접 호출하지 않습니다.
 - 외부 종목 마스터, RSS와 AI는 포트 인터페이스 뒤에 격리했습니다.
-- AI 출력의 ticker, enum, score(1~5)를 서버에서 다시 검증합니다.
+- AI 출력의 ticker, enum, score(1~10)를 서버에서 다시 검증합니다.
 - 사용자 소유권은 항상 사용자 UUID가 포함된 쿼리로 확인합니다.
 - 기사 전문 대신 RSS 발췌와 원문 URL을 중심으로 저장합니다.
 
@@ -193,11 +193,14 @@ GET /api/v1/instruments/{instrumentId}/news/sentiment
 
 영향 점수 기준은 다음과 같습니다.
 
-- `1`: 단순 언급 또는 실질 영향 근거가 거의 없음
-- `2`: 간접적이거나 제한적인 낮은 영향
-- `3`: 영업·수요·비용·규제·재무에 명확하고 의미 있는 영향
-- `4`: 주요 사업 또는 재무 결과에 직접적이고 중대한 영향
-- `5`: 전사적·존립적이거나 즉각적으로 매우 중대한 사건
+- `1~2`: 단순 언급 또는 실질 영향 근거가 거의 없음
+- `3~4`: 제한적이거나 간접적인 낮은 영향
+- `5~6`: 영업·수요·비용·규제·재무에 의미 있는 영향
+- `7~8`: 주요 사업·실적·경쟁력에 큰 영향
+- `9~10`: 전사적·존립적이거나 즉각적으로 매우 중대한 사건
+
+분석은 회사 직접 이슈뿐 아니라 기사 근거가 있는 공급망, 주요 고객, 경쟁사, 산업, 규제와 거시 환경의
+간접 영향까지 포함합니다. 기사에 없는 관계를 추정하거나 주가 목표를 제시하지 않습니다.
 
 ```bash
 GEMINI_ENABLED=true
@@ -242,7 +245,7 @@ Flyway가 다음 스키마와 제약을 관리합니다.
 - `portfolio_items` — `(user_id, instrument_id)` unique
 - `news_articles` — canonical URL hash unique
 - `news_related_instruments` — AI 분석 상태와 독립적인 기사-종목 관련성
-- `news_impacts` — `(news_id, instrument_id)` unique, score check `1..5`
+- `news_impacts` — `(news_id, instrument_id)` unique, score check `1..10`
 
 ## 검증
 

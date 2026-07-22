@@ -37,8 +37,12 @@ public class OllamaNewsAnalyzer implements NewsAnalyzerPort {
     @Override
     public NewsAnalysisResult analyze(CollectedNews news, Set<String> allowedTickers) {
         String prompt = """
-                당신은 금융 뉴스 분석기입니다. 아래 뉴스를 한국어로 번역·요약하고 허용된 종목에 대한 영향 가능성만 분석하세요.
-                주가를 예측하거나 투자 조언을 하지 마세요. score는 1~5, direction은 POSITIVE/NEUTRAL/NEGATIVE 중 하나입니다.
+                당신은 금융 뉴스 분석기입니다. 아래 뉴스를 한국어로 번역·요약하고 허용된 종목에 대한 영향 가능성을 분석하세요.
+                회사의 직접 이슈뿐 아니라 공급망, 주요 고객, 경쟁사, 산업, 규제, 금리·환율 등 거시 환경의 간접 영향도
+                기사에 근거가 있을 때만 반영하세요. 기사에 없는 연관성은 추정하지 마세요.
+                주가를 예측하거나 투자 조언을 하지 마세요. score는 1~10, direction은 POSITIVE/NEUTRAL/NEGATIVE 중 하나입니다.
+                score 기준: 1~2 단순 언급·영향 거의 없음, 3~4 제한적 간접 영향, 5~6 의미 있는 영향,
+                7~8 주요 사업·실적에 큰 영향, 9~10 전사적·즉각적으로 매우 중대한 영향입니다.
                 upProbability, downProbability, neutralProbability는 이 기사에 대한 단기 시장 반응 가능성을 나타내는
                 0~100 정수 퍼센트이며 반드시 합계가 100이어야 합니다. 근거가 약하면 neutralProbability를 가장 높게 설정하세요.
                 반드시 JSON 객체만 반환하세요. 키: translatedTitle, translatedContent, summary, marketContext, impacts.
@@ -76,7 +80,7 @@ public class OllamaNewsAnalyzer implements NewsAnalyzerPort {
                 if (!allowedTickers.contains(ticker)) continue;
                 ImpactDirection direction = ImpactDirection.valueOf(requiredText(item, "direction").toUpperCase());
                 int score = item.path("score").asInt();
-                if (score < 1 || score > 5) throw new IllegalArgumentException("AI impact score is out of range");
+                if (score < 1 || score > 10) throw new IllegalArgumentException("AI impact score is out of range");
                 int upProbability = requiredProbability(item, "upProbability");
                 int downProbability = requiredProbability(item, "downProbability");
                 int neutralProbability = requiredProbability(item, "neutralProbability");

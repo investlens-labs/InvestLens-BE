@@ -68,7 +68,7 @@ public class NewsTranslation extends BaseTimeEntity {
         this.translatedTitle = requireText(translatedTitle, "translatedTitle", 700);
         this.summary = requireText(summary, "summary", 2000);
         if (impactDirection == null) throw new IllegalArgumentException("impactDirection must not be null");
-        if (impactScore < 1 || impactScore > 5) throw new IllegalArgumentException("impactScore must be between 1 and 5");
+        if (impactScore < 1 || impactScore > 10) throw new IllegalArgumentException("impactScore must be between 1 and 10");
         this.impactDirection = impactDirection;
         this.impactScore = impactScore;
         this.impactReason = requireText(impactReason, "impactReason", 2000);
@@ -85,7 +85,7 @@ public class NewsTranslation extends BaseTimeEntity {
         this.translatedTitle = requireText(translatedTitle, "translatedTitle", 700);
         this.summary = requireText(summary, "summary", 2000);
         if (impactDirection == null) throw new IllegalArgumentException("impactDirection must not be null");
-        if (impactScore < 1 || impactScore > 5) throw new IllegalArgumentException("impactScore must be between 1 and 5");
+        if (impactScore < 1 || impactScore > 10) throw new IllegalArgumentException("impactScore must be between 1 and 10");
         this.impactDirection = impactDirection;
         this.impactScore = impactScore;
         this.impactReason = requireText(impactReason, "impactReason", 2000);

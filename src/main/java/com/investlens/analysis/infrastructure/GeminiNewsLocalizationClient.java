@@ -93,14 +93,22 @@ public class GeminiNewsLocalizationClient implements NewsLocalizationPort {
                     For every input item, return exactly one result with the same id.
                     Translate the title naturally into %s.
                     Write a neutral, simple summary in %s using 2 or 3 short sentences and at most 400 characters.
-                    Assess the likely business or financial impact on the specified company only.
+                    Assess the likely business or financial impact on the specified company. Consider direct company events
+                    and, only when supported by the article, indirect effects through supply chains, major customers,
+                    competitors, the sector, regulation, interest rates, currency, or macroeconomic conditions.
+                    Do not invent a relationship that is not supported by the input.
                     direction must be POSITIVE, NEUTRAL, or NEGATIVE.
                     Use this exact impact score rubric:
                     1 = negligible: merely mentioned, weak relevance, or no material effect described.
-                    2 = low: indirect or limited effect with small likely business significance.
-                    3 = medium: clear and meaningful effect on operations, demand, cost, regulation, or finances.
-                    4 = high: direct material effect likely to influence major business or financial outcomes.
-                    5 = critical: exceptional, company-wide, existential, or immediately material event.
+                    2 = minimal: very weak or speculative relevance.
+                    3 = low: limited indirect effect with small likely business significance.
+                    4 = limited: credible but narrowly scoped business effect.
+                    5 = moderate: clear effect on operations, demand, cost, regulation, or finances.
+                    6 = meaningful: material but not major impact on business or financial outcomes.
+                    7 = high: direct impact likely to affect a major product, market, or financial result.
+                    8 = very high: broad impact on core operations, guidance, or competitive position.
+                    9 = severe: exceptional, company-wide, or immediately material event.
+                    10 = critical: existential, systemic, or extremely material immediate event.
                     If evidence is mixed, insufficient, or direction is unclear, use NEUTRAL and do not inflate the score.
                     Also estimate only the likely immediate market reaction to this article, not a future price target.
                     Return upProbability, downProbability, and neutralProbability as whole-number percentages from 0 to 100.
@@ -168,7 +176,7 @@ public class GeminiNewsLocalizationClient implements NewsLocalizationPort {
                                 "summary", Map.of("type", "STRING"),
                                 "direction", Map.of("type", "STRING",
                                         "enum", List.of("POSITIVE", "NEUTRAL", "NEGATIVE")),
-                                "score", Map.of("type", "INTEGER", "minimum", 1, "maximum", 5),
+                                "score", Map.of("type", "INTEGER", "minimum", 1, "maximum", 10),
                                 "reason", Map.of("type", "STRING"),
                                 "upProbability", Map.of("type", "INTEGER", "minimum", 0, "maximum", 100),
                                 "downProbability", Map.of("type", "INTEGER", "minimum", 0, "maximum", 100),
@@ -183,7 +191,7 @@ public class GeminiNewsLocalizationClient implements NewsLocalizationPort {
 
     private static int requiredScore(JsonNode node) {
         int score = node.path("score").asInt();
-        if (score < 1 || score > 5) {
+        if (score < 1 || score > 10) {
             throw new IllegalArgumentException("Gemini impact score is out of range");
         }
         return score;

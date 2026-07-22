@@ -52,7 +52,7 @@ public class NewsImpact {
                       Integer upProbability, Integer downProbability, Integer neutralProbability) {
         if (instrument == null) throw new IllegalArgumentException("instrument must not be null");
         if (direction == null) throw new IllegalArgumentException("direction must not be null");
-        if (score < 1 || score > 5) throw new IllegalArgumentException("score must be between 1 and 5");
+        if (score < 1 || score > 10) throw new IllegalArgumentException("score must be between 1 and 10");
         if (reason == null || reason.isBlank()) throw new IllegalArgumentException("reason must not be blank");
         validateProbabilities(upProbability, downProbability, neutralProbability);
         this.id = UUID.randomUUID();
@@ -69,7 +69,7 @@ public class NewsImpact {
     public void updateAiAssessment(ImpactDirection direction, int score, String reason, String modelName,
                                    Integer upProbability, Integer downProbability, Integer neutralProbability) {
         if (direction == null) throw new IllegalArgumentException("direction must not be null");
-        if (score < 1 || score > 5) throw new IllegalArgumentException("score must be between 1 and 5");
+        if (score < 1 || score > 10) throw new IllegalArgumentException("score must be between 1 and 10");
         if (reason == null || reason.isBlank()) throw new IllegalArgumentException("reason must not be blank");
         if (modelName == null || modelName.isBlank()) throw new IllegalArgumentException("modelName must not be blank");
         validateProbabilities(upProbability, downProbability, neutralProbability);

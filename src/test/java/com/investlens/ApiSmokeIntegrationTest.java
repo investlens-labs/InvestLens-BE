@@ -90,7 +90,7 @@ class ApiSmokeIntegrationTest {
                 "Original", Instant.now());
         article.relateTo(List.of(instrument, apple));
         article.completeAnalysis("번역", "번역 본문", "요약", "시장 맥락", "test-model",
-                List.of(new NewsImpact(instrument, ImpactDirection.POSITIVE, 5, "수요 증가"),
+                List.of(new NewsImpact(instrument, ImpactDirection.POSITIVE, 10, "수요 증가"),
                         new NewsImpact(apple, ImpactDirection.NEGATIVE, 2, "경쟁 심화")));
         newsRepository.saveAndFlush(article);
         mockMvc.perform(get("/api/v1/instruments/{instrumentId}/news", instrument.getId())

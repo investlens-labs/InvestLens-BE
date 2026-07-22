@@ -32,7 +32,7 @@ public class NewsController {
     public Page<NewsResponses.FeedItem> feed(
             Authentication authentication,
             @RequestParam(required = false) ImpactDirection direction,
-            @RequestParam(required = false) @Min(1) @Max(5) Integer minScore,
+            @RequestParam(required = false) @Min(1) @Max(10) Integer minScore,
             @RequestParam(defaultValue = "0") @Min(0) int page,
             @RequestParam(defaultValue = "20") @Min(1) @Max(100) int size) {
         return newsQueryService.getFeed(UUID.fromString(authentication.getName()), direction, minScore, page, size);
