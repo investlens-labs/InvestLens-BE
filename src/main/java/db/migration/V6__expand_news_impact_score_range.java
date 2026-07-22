@@ -44,7 +44,8 @@ public class V6__expand_news_impact_score_range extends BaseJavaMigration {
             try (ResultSet result = statement.executeQuery()) {
                 while (result.next()) {
                     String clause = result.getString("check_clause");
-                    if (clause != null && clause.toLowerCase(java.util.Locale.ROOT).contains(column)) {
+                    String normalizedClause = clause == null ? "" : clause.toLowerCase(java.util.Locale.ROOT);
+                    if (normalizedClause.contains(column) && normalizedClause.contains("between")) {
                         constraints.add(result.getString("constraint_name"));
                     }
                 }
