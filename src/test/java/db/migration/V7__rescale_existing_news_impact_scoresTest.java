@@ -42,8 +42,8 @@ class V7__rescale_existing_news_impact_scoresTest {
         try (Statement statement = connection.createStatement()) {
             statement.execute("CREATE TABLE flyway_schema_history (installed_rank INT, version VARCHAR(20), installed_on TIMESTAMP, success BOOLEAN)");
             statement.execute("CREATE TABLE news_articles (id VARCHAR(20) PRIMARY KEY, updated_at TIMESTAMP)");
-            statement.execute("CREATE TABLE news_impacts (news_id VARCHAR(20), score INT)");
-            statement.execute("CREATE TABLE news_translations (news_id VARCHAR(20), impact_score INT, updated_at TIMESTAMP)");
+            statement.execute("CREATE TABLE news_impacts (news_id VARCHAR(20), score INT CHECK (score BETWEEN 1 AND 5))");
+            statement.execute("CREATE TABLE news_translations (news_id VARCHAR(20), impact_score INT CHECK (impact_score BETWEEN 1 AND 5), updated_at TIMESTAMP)");
         }
     }
 
