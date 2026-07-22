@@ -152,7 +152,11 @@ jobs:
               | jq -r '.status')"
             echo "Render deploy $deploy_id: $status ($attempt/40)"
             case "$status" in
-              live) exit 0 ;;
+              live)
+                echo "Render reports live; allowing routing to stabilize"
+                sleep 30
+                exit 0
+                ;;
               build_failed|update_failed|canceled|deactivated) exit 1 ;;
             esac
             sleep 20

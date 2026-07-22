@@ -47,6 +47,10 @@ services:
         sync: false
       - key: JAVA_OPTS
         value: -Xms64m -Xmx256m -XX:+UseSerialGC -XX:+ExitOnOutOfMemoryError
+      - key: SPRING_MAIN_LAZY_INITIALIZATION
+        value: true
+      - key: SPRING_DATA_JPA_REPOSITORIES_BOOTSTRAP_MODE
+        value: lazy
 
 databases:
   - name: investlens-db

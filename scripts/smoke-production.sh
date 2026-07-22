@@ -6,11 +6,11 @@ FRONTEND_ORIGIN="${FRONTEND_ORIGIN:-https://investlens.mandoo4137-a53.workers.de
 TMP_DIR="$(mktemp -d)"
 trap 'rm -rf "$TMP_DIR"' EXIT
 
-curl --fail --silent --show-error --retry 12 --retry-delay 10 --retry-all-errors \
+curl --fail --silent --show-error --retry 30 --retry-delay 10 --retry-all-errors \
   "$BASE_URL/actuator/health" > "$TMP_DIR/health.json"
 jq -e '.status == "UP"' "$TMP_DIR/health.json" >/dev/null
 
-curl --fail --silent --show-error --retry 6 --retry-delay 5 --retry-all-errors \
+curl --fail --silent --show-error --retry 30 --retry-delay 10 --retry-all-errors \
   "$BASE_URL/v3/api-docs" > "$TMP_DIR/openapi.json"
 jq -e '
   .paths["/api/v1/instruments"] != null and
