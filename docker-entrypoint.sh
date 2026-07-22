@@ -21,4 +21,6 @@ if [ -n "${DATABASE_URL:-}" ]; then
     esac
 fi
 
-exec java ${JAVA_OPTS:-} -jar /app/app.jar --server.port="${PORT:-8080}"
+exec java ${JAVA_OPTS:-} -jar /app/app.jar \
+    --server.address=0.0.0.0 \
+    --server.port="${PORT:-8080}"

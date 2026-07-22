@@ -46,7 +46,7 @@ services:
       - key: LOGO_DEV_PUBLISHABLE_KEY
         sync: false
       - key: JAVA_OPTS
-        value: -XX:MaxRAMPercentage=75 -XX:+UseSerialGC
+        value: -Xms64m -Xmx256m -XX:+UseSerialGC -XX:+ExitOnOutOfMemoryError
 
 databases:
   - name: investlens-db
