@@ -32,7 +32,10 @@ class JwtTokenProviderTest {
     void rejectsTamperedToken() {
         JwtTokenProvider provider = providerAt(NOW);
         String token = provider.createToken(new User("user@example.com", "encoded-password"));
-        String tampered = token.substring(0, token.length() - 1) + (token.endsWith("a") ? "b" : "a");
+        int signatureStart = token.lastIndexOf('.') + 1;
+        char firstSignatureCharacter = token.charAt(signatureStart);
+        char replacement = firstSignatureCharacter == 'a' ? 'b' : 'a';
+        String tampered = token.substring(0, signatureStart) + replacement + token.substring(signatureStart + 1);
 
         assertInvalidToken(() -> provider.parse(tampered));
     }
