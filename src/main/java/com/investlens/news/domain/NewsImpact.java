@@ -35,32 +35,64 @@ public class NewsImpact {
     private boolean aiAnalyzed;
     @Column(name = "analysis_model", length = 100)
     private String analysisModel;
+    @Column(name = "up_probability")
+    private Integer upProbability;
+    @Column(name = "down_probability")
+    private Integer downProbability;
+    @Column(name = "neutral_probability")
+    private Integer neutralProbability;
 
     protected NewsImpact() {}
 
     public NewsImpact(Instrument instrument, ImpactDirection direction, int score, String reason) {
+        this(instrument, direction, score, reason, null, null, null);
+    }
+
+    public NewsImpact(Instrument instrument, ImpactDirection direction, int score, String reason,
+                      Integer upProbability, Integer downProbability, Integer neutralProbability) {
         if (instrument == null) throw new IllegalArgumentException("instrument must not be null");
         if (direction == null) throw new IllegalArgumentException("direction must not be null");
         if (score < 1 || score > 5) throw new IllegalArgumentException("score must be between 1 and 5");
         if (reason == null || reason.isBlank()) throw new IllegalArgumentException("reason must not be blank");
+        validateProbabilities(upProbability, downProbability, neutralProbability);
         this.id = UUID.randomUUID();
         this.instrument = instrument;
         this.direction = direction;
         this.score = score;
         this.reason = reason.strip();
         this.aiAnalyzed = false;
+        this.upProbability = upProbability;
+        this.downProbability = downProbability;
+        this.neutralProbability = neutralProbability;
     }
 
-    public void updateAiAssessment(ImpactDirection direction, int score, String reason, String modelName) {
+    public void updateAiAssessment(ImpactDirection direction, int score, String reason, String modelName,
+                                   Integer upProbability, Integer downProbability, Integer neutralProbability) {
         if (direction == null) throw new IllegalArgumentException("direction must not be null");
         if (score < 1 || score > 5) throw new IllegalArgumentException("score must be between 1 and 5");
         if (reason == null || reason.isBlank()) throw new IllegalArgumentException("reason must not be blank");
         if (modelName == null || modelName.isBlank()) throw new IllegalArgumentException("modelName must not be blank");
+        validateProbabilities(upProbability, downProbability, neutralProbability);
         this.direction = direction;
         this.score = score;
         this.reason = reason.strip();
         this.aiAnalyzed = true;
         this.analysisModel = modelName.strip();
+        this.upProbability = upProbability;
+        this.downProbability = downProbability;
+        this.neutralProbability = neutralProbability;
+    }
+
+    private static void validateProbabilities(Integer upProbability, Integer downProbability,
+                                              Integer neutralProbability) {
+        if (upProbability == null && downProbability == null && neutralProbability == null) return;
+        if (upProbability == null || downProbability == null || neutralProbability == null
+                || upProbability < 0 || upProbability > 100
+                || downProbability < 0 || downProbability > 100
+                || neutralProbability < 0 || neutralProbability > 100
+                || upProbability + downProbability + neutralProbability != 100) {
+            throw new IllegalArgumentException("probabilities must be integers between 0 and 100 and sum to 100");
+        }
     }
 
     void attachTo(NewsArticle news) { this.news = news; }
@@ -71,4 +103,7 @@ public class NewsImpact {
     public String getReason() { return reason; }
     public boolean isAiAnalyzed() { return aiAnalyzed; }
     public String getAnalysisModel() { return analysisModel; }
+    public Integer getUpProbability() { return upProbability; }
+    public Integer getDownProbability() { return downProbability; }
+    public Integer getNeutralProbability() { return neutralProbability; }
 }

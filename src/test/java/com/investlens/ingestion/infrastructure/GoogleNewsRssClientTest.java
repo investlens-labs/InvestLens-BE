@@ -20,7 +20,8 @@ class GoogleNewsRssClientTest {
         assertThat(url)
                 .contains("news.google.com/rss/search")
                 .contains("%EC%82%BC%EC%84%B1%EC%A0%84%EC%9E%90")
-                .contains("when:90d", "hl=ko", "gl=KR", "ceid=KR:ko");
+                .contains("when:90d", "hl=ko", "gl=KR", "ceid=KR:ko")
+                .doesNotContain("%EC%A3%BC%EC%8B%9D");
     }
 
     @Test
@@ -31,7 +32,7 @@ class GoogleNewsRssClientTest {
                 "AAPL", "Apple Inc. - Common Stock", InstrumentType.STOCK, InstrumentMarket.US));
 
         assertThat(url).contains("Apple%20Inc.", "AAPL", "when:90d", "hl=en-US")
-                .doesNotContain("Common%20Stock");
+                .doesNotContain("Common%20Stock", "stock");
     }
 
     private GoogleNewsRssClient client() {

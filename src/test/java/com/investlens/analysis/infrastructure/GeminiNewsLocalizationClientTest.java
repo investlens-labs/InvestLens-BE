@@ -44,7 +44,10 @@ class GeminiNewsLocalizationClientTest {
                 "summary", "첫 문장입니다. 두 번째 문장입니다.",
                 "direction", "POSITIVE",
                 "score", 3,
-                "reason", "수요 증가 가능성이 명시됐습니다."
+                "reason", "수요 증가 가능성이 명시됐습니다.",
+                "upProbability", 65,
+                "downProbability", 10,
+                "neutralProbability", 25
         )));
         var response = objectMapper.readTree("""
                 {
@@ -65,6 +68,9 @@ class GeminiNewsLocalizationClientTest {
             assertThat(item.summary()).contains("첫 문장");
             assertThat(item.direction()).isEqualTo(com.investlens.news.domain.ImpactDirection.POSITIVE);
             assertThat(item.score()).isEqualTo(3);
+            assertThat(item.upProbability()).isEqualTo(65);
+            assertThat(item.downProbability()).isEqualTo(10);
+            assertThat(item.neutralProbability()).isEqualTo(25);
             assertThat(item.aiAnalyzed()).isTrue();
             assertThat(item.modelName()).isEqualTo("gemini-test");
         });
@@ -76,6 +82,24 @@ class GeminiNewsLocalizationClientTest {
         var response = objectMapper.readTree("""
                 {"candidates":[{"content":{"parts":[{"text":"[]"}]}}]}
                 """);
+
+        assertThatThrownBy(() -> client.parseResponse(response, List.of(
+                new NewsLocalizationPort.Request(id, "Original", "Content", "AAPL", "Apple"))))
+                .isInstanceOf(IllegalStateException.class)
+                .hasMessageContaining("Invalid Gemini");
+    }
+
+    @Test
+    void rejectsProbabilitiesThatDoNotSumToOneHundred() throws Exception {
+        UUID id = UUID.randomUUID();
+        String generated = objectMapper.writeValueAsString(List.of(java.util.Map.of(
+                "id", id.toString(), "translatedTitle", "번역", "summary", "요약",
+                "direction", "NEUTRAL", "score", 2, "reason", "근거가 제한적입니다.",
+                "upProbability", 50, "downProbability", 30, "neutralProbability", 30
+        )));
+        var response = objectMapper.readTree("""
+                {"candidates":[{"content":{"parts":[{"text":%s}]}}]}
+                """.formatted(objectMapper.writeValueAsString(generated)));
 
         assertThatThrownBy(() -> client.parseResponse(response, List.of(
                 new NewsLocalizationPort.Request(id, "Original", "Content", "AAPL", "Apple"))))

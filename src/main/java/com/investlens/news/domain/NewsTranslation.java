@@ -44,6 +44,15 @@ public class NewsTranslation extends BaseTimeEntity {
     @Column(name = "impact_reason", nullable = false, columnDefinition = "text")
     private String impactReason;
 
+    @Column(name = "up_probability")
+    private Integer upProbability;
+
+    @Column(name = "down_probability")
+    private Integer downProbability;
+
+    @Column(name = "neutral_probability")
+    private Integer neutralProbability;
+
     @Column(name = "model_name", nullable = false, length = 100)
     private String modelName;
 
@@ -51,7 +60,8 @@ public class NewsTranslation extends BaseTimeEntity {
 
     public NewsTranslation(NewsArticle news, NewsLanguage language, String translatedTitle,
                            String summary, ImpactDirection impactDirection, int impactScore,
-                           String impactReason, String modelName) {
+                           String impactReason, Integer upProbability, Integer downProbability,
+                           Integer neutralProbability, String modelName) {
         this.id = UUID.randomUUID();
         this.news = news;
         this.language = language.code();
@@ -62,7 +72,40 @@ public class NewsTranslation extends BaseTimeEntity {
         this.impactDirection = impactDirection;
         this.impactScore = impactScore;
         this.impactReason = requireText(impactReason, "impactReason", 2000);
+        validateProbabilities(upProbability, downProbability, neutralProbability);
+        this.upProbability = upProbability;
+        this.downProbability = downProbability;
+        this.neutralProbability = neutralProbability;
         this.modelName = requireText(modelName, "modelName", 100);
+    }
+
+    public void update(String translatedTitle, String summary, ImpactDirection impactDirection, int impactScore,
+                       String impactReason, Integer upProbability, Integer downProbability,
+                       Integer neutralProbability, String modelName) {
+        this.translatedTitle = requireText(translatedTitle, "translatedTitle", 700);
+        this.summary = requireText(summary, "summary", 2000);
+        if (impactDirection == null) throw new IllegalArgumentException("impactDirection must not be null");
+        if (impactScore < 1 || impactScore > 5) throw new IllegalArgumentException("impactScore must be between 1 and 5");
+        this.impactDirection = impactDirection;
+        this.impactScore = impactScore;
+        this.impactReason = requireText(impactReason, "impactReason", 2000);
+        validateProbabilities(upProbability, downProbability, neutralProbability);
+        this.upProbability = upProbability;
+        this.downProbability = downProbability;
+        this.neutralProbability = neutralProbability;
+        this.modelName = requireText(modelName, "modelName", 100);
+    }
+
+    private static void validateProbabilities(Integer upProbability, Integer downProbability,
+                                              Integer neutralProbability) {
+        if (upProbability == null && downProbability == null && neutralProbability == null) return;
+        if (upProbability == null || downProbability == null || neutralProbability == null
+                || upProbability < 0 || upProbability > 100
+                || downProbability < 0 || downProbability > 100
+                || neutralProbability < 0 || neutralProbability > 100
+                || upProbability + downProbability + neutralProbability != 100) {
+            throw new IllegalArgumentException("probabilities must be integers between 0 and 100 and sum to 100");
+        }
     }
 
     private static String requireText(String value, String field, int maxLength) {
@@ -103,5 +146,12 @@ public class NewsTranslation extends BaseTimeEntity {
 
     public String getImpactReason() {
         return impactReason;
+    }
+
+    public Integer getUpProbability() { return upProbability; }
+    public Integer getDownProbability() { return downProbability; }
+    public Integer getNeutralProbability() { return neutralProbability; }
+    public boolean hasProbabilities() {
+        return upProbability != null && downProbability != null && neutralProbability != null;
     }
 }

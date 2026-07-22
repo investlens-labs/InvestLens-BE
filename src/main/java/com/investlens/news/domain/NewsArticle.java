@@ -100,12 +100,14 @@ public class NewsArticle extends BaseTimeEntity {
     }
 
     public void updateImpactAssessment(UUID instrumentId, com.investlens.news.domain.ImpactDirection direction,
-                                       int score, String reason, String modelName) {
+                                       int score, String reason, String modelName,
+                                       Integer upProbability, Integer downProbability, Integer neutralProbability) {
         NewsImpact impact = impacts.stream()
                 .filter(item -> item.getInstrument().getId().equals(instrumentId))
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Related impact was not found"));
-        impact.updateAiAssessment(direction, score, reason, modelName);
+        impact.updateAiAssessment(direction, score, reason, modelName,
+                upProbability, downProbability, neutralProbability);
     }
 
     private static String requireText(String value, String field) {

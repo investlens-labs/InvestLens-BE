@@ -69,9 +69,9 @@ public class GoogleNewsRssClient implements InstrumentNewsSourcePort {
     String buildUrl(Instrument instrument) {
         boolean korean = instrument.getMarket() == InstrumentMarket.KR;
         String query = korean
-                ? "\"" + instrument.getCompanyName() + "\" 주식 when:" + properties.lookbackDays() + "d"
+                ? "\"" + instrument.getCompanyName() + "\" when:" + properties.lookbackDays() + "d"
                 : "(\"" + cleanUsName(instrument.getCompanyName()) + "\" OR " + instrument.getTicker()
-                        + ") stock when:" + properties.lookbackDays() + "d";
+                        + ") when:" + properties.lookbackDays() + "d";
         String language = korean ? "ko" : "en";
         String country = korean ? "KR" : "US";
         String hostLanguage = korean ? "ko" : "en-US";

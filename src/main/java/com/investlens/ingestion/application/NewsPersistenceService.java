@@ -35,7 +35,8 @@ public class NewsPersistenceService {
                 .map(item -> {
                     Instrument instrument = instruments.get(item.ticker().toUpperCase(Locale.ROOT));
                     if (instrument == null) throw new IllegalArgumentException("Analyzer returned an unapproved ticker");
-                    return new NewsImpact(instrument, item.direction(), item.score(), item.reason());
+                    return new NewsImpact(instrument, item.direction(), item.score(), item.reason(),
+                            item.upProbability(), item.downProbability(), item.neutralProbability());
                 }).toList();
         if (impacts.isEmpty()) throw new IllegalStateException("Analyzer returned no allowed impacts");
         article.completeAnalysis(result.translatedTitle(), result.translatedContent(), result.summary(),

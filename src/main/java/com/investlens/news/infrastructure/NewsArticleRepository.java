@@ -31,6 +31,12 @@ public interface NewsArticleRepository extends JpaRepository<NewsArticle, UUID> 
     Page<NewsArticle> findByInstrumentId(@Param("instrumentId") UUID instrumentId, Pageable pageable);
 
     @EntityGraph(attributePaths = {"impacts", "impacts.instrument"})
+    @Query("select distinct n from NewsArticle n join n.impacts i "
+            + "where i.instrument.id = :instrumentId "
+            + "order by n.publishedAt desc, n.id desc")
+    List<NewsArticle> findAllWithImpactsByInstrumentId(@Param("instrumentId") UUID instrumentId);
+
+    @EntityGraph(attributePaths = {"impacts", "impacts.instrument"})
     @Query("select distinct n from NewsArticle n join n.relatedInstruments r where n.id = :id and r.instrument.id in :instrumentIds")
     Optional<NewsArticle> findDetailForInstruments(@Param("id") UUID id,
                                                     @Param("instrumentIds") Collection<UUID> instrumentIds);

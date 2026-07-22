@@ -190,6 +190,12 @@ class ApiSmokeIntegrationTest {
                         .header("Authorization", "Bearer " + token))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.content").isArray());
+        mockMvc.perform(get("/api/v1/instruments/{instrumentId}/news/sentiment", instrument.getId())
+                        .header("Authorization", "Bearer " + token))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.upPercentage").isNumber())
+                .andExpect(jsonPath("$.downPercentage").isNumber())
+                .andExpect(jsonPath("$.neutralPercentage").isNumber());
         mockMvc.perform(get("/api/v1/instruments/{instrumentId}/news", instrument.getId())
                         .header("Authorization", "Bearer " + token)
                         .param("language", "fr"))
@@ -205,8 +211,12 @@ class ApiSmokeIntegrationTest {
                 .andExpect(jsonPath("$.paths['/api/v1/news']").exists())
                 .andExpect(jsonPath("$.paths['/api/v1/instruments/{instrumentId}/chart']").exists())
                 .andExpect(jsonPath("$.paths['/api/v1/instruments/{instrumentId}/news']").exists())
+                .andExpect(jsonPath("$.paths['/api/v1/instruments/{instrumentId}/news/sentiment']").exists())
                 .andExpect(jsonPath("$.components.schemas.InstrumentResponse.properties.logoUrl").exists())
                 .andExpect(jsonPath("$.components.schemas.InstrumentResponse.properties.logoAttributionUrl").exists())
+                .andExpect(jsonPath("$.components.schemas.Impact.properties.upProbability").exists())
+                .andExpect(jsonPath("$.components.schemas.Impact.properties.downProbability").exists())
+                .andExpect(jsonPath("$.components.schemas.Impact.properties.neutralProbability").exists())
                 .andExpect(jsonPath("$.components.securitySchemes.bearerAuth").exists());
         mockMvc.perform(get("/swagger-ui.html")).andExpect(status().is3xxRedirection());
     }

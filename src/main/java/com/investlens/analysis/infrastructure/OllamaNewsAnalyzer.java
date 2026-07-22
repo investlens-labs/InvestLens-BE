@@ -39,8 +39,10 @@ public class OllamaNewsAnalyzer implements NewsAnalyzerPort {
         String prompt = """
                 당신은 금융 뉴스 분석기입니다. 아래 뉴스를 한국어로 번역·요약하고 허용된 종목에 대한 영향 가능성만 분석하세요.
                 주가를 예측하거나 투자 조언을 하지 마세요. score는 1~5, direction은 POSITIVE/NEUTRAL/NEGATIVE 중 하나입니다.
+                upProbability, downProbability, neutralProbability는 이 기사에 대한 단기 시장 반응 가능성을 나타내는
+                0~100 정수 퍼센트이며 반드시 합계가 100이어야 합니다. 근거가 약하면 neutralProbability를 가장 높게 설정하세요.
                 반드시 JSON 객체만 반환하세요. 키: translatedTitle, translatedContent, summary, marketContext, impacts.
-                impacts 원소 키: ticker, direction, score, reason.
+                impacts 원소 키: ticker, direction, score, reason, upProbability, downProbability, neutralProbability.
                 허용 티커: %s
                 제목: %s
                 내용: %s
@@ -75,7 +77,14 @@ public class OllamaNewsAnalyzer implements NewsAnalyzerPort {
                 ImpactDirection direction = ImpactDirection.valueOf(requiredText(item, "direction").toUpperCase());
                 int score = item.path("score").asInt();
                 if (score < 1 || score > 5) throw new IllegalArgumentException("AI impact score is out of range");
-                impacts.add(new NewsAnalysisResult.Impact(ticker, direction, score, requiredText(item, "reason")));
+                int upProbability = requiredProbability(item, "upProbability");
+                int downProbability = requiredProbability(item, "downProbability");
+                int neutralProbability = requiredProbability(item, "neutralProbability");
+                if (upProbability + downProbability + neutralProbability != 100) {
+                    throw new IllegalArgumentException("AI probabilities must sum to 100");
+                }
+                impacts.add(new NewsAnalysisResult.Impact(ticker, direction, score, requiredText(item, "reason"),
+                        upProbability, downProbability, neutralProbability));
             }
             if (impacts.isEmpty()) throw new IllegalArgumentException("AI returned no valid impact");
             return new NewsAnalysisResult(requiredText(result, "translatedTitle"),
@@ -94,6 +103,17 @@ public class OllamaNewsAnalyzer implements NewsAnalyzerPort {
     private static String optionalText(JsonNode node, String field, String fallback) {
         String value = node.path(field).asText();
         return value.isBlank() ? fallback : value;
+    }
+
+    private static int requiredProbability(JsonNode node, String field) {
+        if (!node.has(field) || !node.get(field).canConvertToInt()) {
+            throw new IllegalArgumentException("Missing or invalid probability: " + field);
+        }
+        int value = node.get(field).asInt();
+        if (value < 0 || value > 100) {
+            throw new IllegalArgumentException("AI probability is out of range");
+        }
+        return value;
     }
 
     private static String limit(String value, int maxLength) {

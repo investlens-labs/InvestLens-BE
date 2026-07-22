@@ -11,5 +11,17 @@ public record NewsAnalysisResult(
         String modelName,
         List<Impact> impacts
 ) {
-    public record Impact(String ticker, ImpactDirection direction, int score, String reason) {}
+    public record Impact(
+            String ticker,
+            ImpactDirection direction,
+            int score,
+            String reason,
+            Integer upProbability,
+            Integer downProbability,
+            Integer neutralProbability
+    ) {
+        public Impact(String ticker, ImpactDirection direction, int score, String reason) {
+            this(ticker, direction, score, reason, null, null, null);
+        }
+    }
 }

@@ -27,9 +27,9 @@ public class NewsTranslationPersistenceService {
                                          List<NewsLocalizationPort.Result> results) {
         results.forEach(result -> {
             var article = newsRepository.findById(result.newsId()).orElseThrow();
-            boolean alreadyStored = !repository.findAllByNewsIdInAndLanguage(
-                    List.of(result.newsId()), language.code()).isEmpty();
-            if (!alreadyStored) {
+            var existing = repository.findAllByNewsIdInAndLanguage(
+                    List.of(result.newsId()), language.code()).stream().findFirst();
+            if (existing.isEmpty()) {
                 repository.save(new NewsTranslation(
                         article,
                         language,
@@ -38,11 +38,19 @@ public class NewsTranslationPersistenceService {
                         result.direction(),
                         result.score(),
                         result.reason(),
+                        result.upProbability(),
+                        result.downProbability(),
+                        result.neutralProbability(),
                         result.modelName()
                 ));
+            } else {
+                existing.get().update(result.translatedTitle(), result.summary(), result.direction(), result.score(),
+                        result.reason(), result.upProbability(), result.downProbability(), result.neutralProbability(),
+                        result.modelName());
             }
             article.updateImpactAssessment(instrumentId, result.direction(), result.score(),
-                    result.reason(), result.modelName());
+                    result.reason(), result.modelName(), result.upProbability(),
+                    result.downProbability(), result.neutralProbability());
         });
     }
 }

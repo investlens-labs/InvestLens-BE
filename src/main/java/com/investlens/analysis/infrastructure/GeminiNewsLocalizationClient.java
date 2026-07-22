@@ -102,6 +102,10 @@ public class GeminiNewsLocalizationClient implements NewsLocalizationPort {
                     4 = high: direct material effect likely to influence major business or financial outcomes.
                     5 = critical: exceptional, company-wide, existential, or immediately material event.
                     If evidence is mixed, insufficient, or direction is unclear, use NEUTRAL and do not inflate the score.
+                    Also estimate only the likely immediate market reaction to this article, not a future price target.
+                    Return upProbability, downProbability, and neutralProbability as whole-number percentages from 0 to 100.
+                    The three values must add up to exactly 100. If evidence is weak or mixed, assign the largest share
+                    to neutralProbability. These probabilities are news-impact estimates, never investment advice.
                     Write reason as one short sentence in %s explaining the evidence for direction and score.
                     Do not add facts that are absent from the input. Do not give investment advice or predict prices.
                     Articles JSON:
@@ -138,6 +142,9 @@ public class GeminiNewsLocalizationClient implements NewsLocalizationPort {
                         ImpactDirection.valueOf(requiredText(item, "direction").toUpperCase()),
                         requiredScore(item),
                         limit(requiredText(item, "reason"), 2_000),
+                        requiredProbability(item, "upProbability"),
+                        requiredProbability(item, "downProbability"),
+                        requiredProbability(item, "neutralProbability"),
                         properties.model(),
                         true));
             }
@@ -162,10 +169,14 @@ public class GeminiNewsLocalizationClient implements NewsLocalizationPort {
                                 "direction", Map.of("type", "STRING",
                                         "enum", List.of("POSITIVE", "NEUTRAL", "NEGATIVE")),
                                 "score", Map.of("type", "INTEGER", "minimum", 1, "maximum", 5),
-                                "reason", Map.of("type", "STRING")
+                                "reason", Map.of("type", "STRING"),
+                                "upProbability", Map.of("type", "INTEGER", "minimum", 0, "maximum", 100),
+                                "downProbability", Map.of("type", "INTEGER", "minimum", 0, "maximum", 100),
+                                "neutralProbability", Map.of("type", "INTEGER", "minimum", 0, "maximum", 100)
                         ),
                         "required", List.of(
-                                "id", "translatedTitle", "summary", "direction", "score", "reason")
+                                "id", "translatedTitle", "summary", "direction", "score", "reason",
+                                "upProbability", "downProbability", "neutralProbability")
                 )
         );
     }
@@ -176,6 +187,23 @@ public class GeminiNewsLocalizationClient implements NewsLocalizationPort {
             throw new IllegalArgumentException("Gemini impact score is out of range");
         }
         return score;
+    }
+
+    private static int requiredProbability(JsonNode node, String field) {
+        if (!node.has(field) || !node.get(field).canConvertToInt()) {
+            throw new IllegalArgumentException("Missing or invalid probability: " + field);
+        }
+        int value = node.get(field).asInt();
+        if (value < 0 || value > 100) {
+            throw new IllegalArgumentException("Probability is out of range: " + field);
+        }
+        int total = node.path("upProbability").asInt()
+                + node.path("downProbability").asInt()
+                + node.path("neutralProbability").asInt();
+        if (total != 100) {
+            throw new IllegalArgumentException("Probabilities must sum to 100");
+        }
+        return value;
     }
 
     private static String requiredText(JsonNode node, String field) {

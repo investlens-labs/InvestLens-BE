@@ -17,7 +17,17 @@ public interface NewsLocalizationPort {
             ImpactDirection direction,
             int score,
             String reason,
+            Integer upProbability,
+            Integer downProbability,
+            Integer neutralProbability,
             String modelName,
             boolean aiAnalyzed
-    ) {}
+    ) {
+        public Result(UUID newsId, String translatedTitle, String summary,
+                      ImpactDirection direction, int score, String reason,
+                      String modelName, boolean aiAnalyzed) {
+            this(newsId, translatedTitle, summary, direction, score, reason,
+                    null, null, null, modelName, aiAnalyzed);
+        }
+    }
 }

@@ -13,6 +13,22 @@ import java.util.Set;
 public final class NewsResponses {
     private NewsResponses() {}
 
+    public record Sentiment(
+            boolean aiAnalyzed,
+            int analyzedArticleCount,
+            int relatedArticleCount,
+            int upPercentage,
+            int downPercentage,
+            int neutralPercentage,
+            String analysisModel,
+            String disclaimer
+    ) {
+        public static Sentiment unavailable(int relatedArticleCount) {
+            return new Sentiment(false, 0, relatedArticleCount, 0, 0, 0, null,
+                    "AI 분석 결과가 없어 상승·하락 퍼센트를 계산하지 못했습니다.");
+        }
+    }
+
     public record Impact(
             UUID instrumentId,
             String ticker,
@@ -22,20 +38,25 @@ public final class NewsResponses {
             int score,
             String reason,
             boolean aiAnalyzed,
-            String analysisModel
+            String analysisModel,
+            Integer upProbability,
+            Integer downProbability,
+            Integer neutralProbability
     ) {
         static Impact from(NewsImpact impact) {
             var instrument = impact.getInstrument();
             return new Impact(instrument.getId(), instrument.getTicker(), instrument.getCompanyName(),
                     instrument.getType().name(), impact.getDirection(), impact.getScore(), impact.getReason(),
-                    impact.isAiAnalyzed(), impact.getAnalysisModel());
+                    impact.isAiAnalyzed(), impact.getAnalysisModel(), impact.getUpProbability(),
+                    impact.getDownProbability(), impact.getNeutralProbability());
         }
 
         static Impact localized(NewsImpact impact, NewsLocalizationService.LocalizedView localization) {
             var instrument = impact.getInstrument();
             return new Impact(instrument.getId(), instrument.getTicker(), instrument.getCompanyName(),
                     instrument.getType().name(), localization.direction(), localization.score(),
-                    localization.reason(), localization.localized(), localization.modelName());
+                    localization.reason(), localization.localized(), localization.modelName(), localization.upProbability(),
+                    localization.downProbability(), localization.neutralProbability());
         }
     }
 

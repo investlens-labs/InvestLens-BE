@@ -17,6 +17,7 @@ public class LocalNewsLocalizationClient implements NewsLocalizationPort {
                         excerpt(article.content(), article.title()),
                         ImpactDirection.NEUTRAL, 1,
                         "AI 분석이 비활성화되어 관련성만 표시했습니다.",
+                        null, null, null,
                         "local-fallback", false))
                 .toList();
     }

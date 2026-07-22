@@ -1,5 +1,6 @@
 package com.investlens.news.domain;
 
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import com.investlens.instrument.domain.Instrument;
@@ -21,5 +22,22 @@ class NewsImpactTest {
     void rejectsOutOfRangeScore(int score) {
         assertThatThrownBy(() -> new NewsImpact(instrument, ImpactDirection.NEGATIVE, score, "영향"))
                 .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {99, 101})
+    void rejectsProbabilitiesThatDoNotSumToOneHundred(int total) {
+        assertThatThrownBy(() -> new NewsImpact(instrument, ImpactDirection.POSITIVE, 3, "영향",
+                total - 40, 20, 20))
+                .isInstanceOf(IllegalArgumentException.class);
+    }
+
+    @ParameterizedTest
+    @ValueSource(ints = {0, 50, 100})
+    void acceptsProbabilitiesThatSumToOneHundred(int upProbability) {
+        var impact = new NewsImpact(instrument, ImpactDirection.POSITIVE, 3, "영향",
+                upProbability, 0, 100 - upProbability);
+
+        assertThat(impact.getUpProbability()).isEqualTo(upProbability);
     }
 }

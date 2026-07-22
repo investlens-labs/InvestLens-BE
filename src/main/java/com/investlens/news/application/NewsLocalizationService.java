@@ -49,6 +49,9 @@ public class NewsLocalizationService {
                                 translation.getImpactDirection(),
                                 translation.getImpactScore(),
                                 translation.getImpactReason(),
+                                translation.getUpProbability(),
+                                translation.getDownProbability(),
+                                translation.getNeutralProbability(),
                                 translation.getModelName(),
                                 true
                         ),
@@ -56,7 +59,8 @@ public class NewsLocalizationService {
                         LinkedHashMap::new
                 ));
         List<NewsArticle> missing = articles.stream()
-                .filter(article -> !localized.containsKey(article.getId()))
+                .filter(article -> !localized.containsKey(article.getId())
+                        || !localized.get(article.getId()).hasProbabilities())
                 .toList();
         if (missing.isEmpty()) {
             return Map.copyOf(localized);
@@ -81,6 +85,9 @@ public class NewsLocalizationService {
                     result.direction(),
                     result.score(),
                     result.reason(),
+                    result.upProbability(),
+                    result.downProbability(),
+                    result.neutralProbability(),
                     result.modelName(),
                     aiGenerated
             )));
@@ -106,6 +113,7 @@ public class NewsLocalizationService {
         return new LocalizedView(language.code(), request.title(), summary,
                 com.investlens.news.domain.ImpactDirection.NEUTRAL, 1,
                 "AI 분석을 사용할 수 없어 관련성만 표시했습니다.",
+                null, null, null,
                 "localization-unavailable", false);
     }
 
@@ -116,7 +124,14 @@ public class NewsLocalizationService {
             com.investlens.news.domain.ImpactDirection direction,
             int score,
             String reason,
+            Integer upProbability,
+            Integer downProbability,
+            Integer neutralProbability,
             String modelName,
             boolean localized
-    ) {}
+    ) {
+        public boolean hasProbabilities() {
+            return upProbability != null && downProbability != null && neutralProbability != null;
+        }
+    }
 }

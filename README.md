@@ -97,6 +97,7 @@ https://<service-name>.onrender.com/v3/api-docs
 | GET | `/api/v1/instruments/{id}` | 종목 상세 | Bearer |
 | GET | `/api/v1/instruments/{id}/chart` | 기간별 가격·OHLCV 차트 (`range`) | Bearer |
 | GET | `/api/v1/instruments/{id}/news` | 종목 관련 기사 조회 및 과거 기사 초기 적재 | Bearer |
+| GET | `/api/v1/instruments/{id}/news/sentiment` | 관련 기사 상승·하락 가능성 집계 | Bearer |
 | GET | `/api/v1/portfolio` | 내 포트폴리오 | Bearer |
 | POST | `/api/v1/portfolio` | 종목 등록 (`instrumentId`) | Bearer |
 | DELETE | `/api/v1/portfolio/{id}` | 종목 삭제 | Bearer |
@@ -161,8 +162,34 @@ GET /api/v1/instruments/{instrumentId}/news?language=ko&page=0&size=20
 2~3문장 요약을 생성하고 DB에 캐시합니다. 응답은 최신순 페이지이며 `originalUrl`, `title`,
 `translatedTitle`, `summary`, `language`, `localized`, `publishedAt`, `impacts`를 포함합니다.
 `title`과 `originalUrl`은 항상 원문 정보이며 `localized=false`이면 AI 번역이 일시적으로 제공되지 않은 상태입니다.
-각 `impacts` 항목의 `aiAnalyzed`가 `true`일 때만 `direction`, `score`, `reason`이 Gemini의 실제 평가입니다.
+각 `impacts` 항목의 `aiAnalyzed`가 `true`일 때만 `direction`, `score`, `reason`과
+`upProbability`, `downProbability`, `neutralProbability`가 Gemini의 실제 평가입니다. 세 확률은 합계가 100이며,
+예상 주가 등락률이 아니라 해당 기사에 대한 단기 시장 반응 가능성입니다.
 `false`이면 `NEUTRAL + 1점` fallback이며 `analysisModel`은 비어 있습니다.
+
+종목별 관련 기사 전체의 단기 반응 가능성을 집계하려면 다음 API를 사용합니다.
+
+```http
+GET /api/v1/instruments/{instrumentId}/news/sentiment
+```
+
+응답의 `upPercentage`, `downPercentage`, `neutralPercentage`는 AI가 분석을 완료한 관련 기사별 확률의
+평균값이며 세 값의 합은 100입니다. `analyzedArticleCount`는 실제 AI 분석에 포함된 기사 수이고,
+`relatedArticleCount`는 해당 종목과 연결된 기사 영향 수입니다. `aiAnalyzed=false`이면 AI 결과가 없어
+퍼센트를 계산하지 못한 상태이므로 0을 실제 하락·상승 확률로 표시하면 안 됩니다.
+
+```json
+{
+  "aiAnalyzed": true,
+  "analyzedArticleCount": 12,
+  "relatedArticleCount": 15,
+  "upPercentage": 48,
+  "downPercentage": 22,
+  "neutralPercentage": 30,
+  "analysisModel": "gemini-3.5-flash",
+  "disclaimer": "최근 관련 기사에 대한 AI 기반 단기 시장 반응 가능성입니다. 주가 예측이나 투자 조언이 아닙니다."
+}
+```
 
 영향 점수 기준은 다음과 같습니다.
 

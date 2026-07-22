@@ -43,6 +43,7 @@ class NewsTranslationPersistenceServiceTest {
                 new NewsLocalizationPort.Result(
                         article.getId(), "번역 제목", "짧은 요약입니다.",
                         ImpactDirection.POSITIVE, 4, "직접적인 수요 증가가 명시됐습니다.",
+                        72, 8, 20,
                         "gemini-test", true)
         ));
 
@@ -52,6 +53,9 @@ class NewsTranslationPersistenceServiceTest {
             assertThat(translation.getTranslatedTitle()).isEqualTo("번역 제목");
             assertThat(translation.getImpactDirection()).isEqualTo(ImpactDirection.POSITIVE);
             assertThat(translation.getImpactScore()).isEqualTo(4);
+            assertThat(translation.getUpProbability()).isEqualTo(72);
+            assertThat(translation.getDownProbability()).isEqualTo(8);
+            assertThat(translation.getNeutralProbability()).isEqualTo(20);
         });
         NewsImpact updated = newsRepository.findDetailForInstruments(
                 article.getId(), List.of(instrument.getId())).orElseThrow().getImpacts().get(0);
@@ -59,5 +63,8 @@ class NewsTranslationPersistenceServiceTest {
         assertThat(updated.getDirection()).isEqualTo(ImpactDirection.POSITIVE);
         assertThat(updated.getScore()).isEqualTo(4);
         assertThat(updated.getAnalysisModel()).isEqualTo("gemini-test");
+        assertThat(updated.getUpProbability()).isEqualTo(72);
+        assertThat(updated.getDownProbability()).isEqualTo(8);
+        assertThat(updated.getNeutralProbability()).isEqualTo(20);
     }
 }
