@@ -2,7 +2,8 @@
 
 보유 주식·ETF와 관련된 금융 뉴스를 수집하고, 한국어 요약·번역 및 뉴스 기반 영향 가능성을 제공하는 Spring Boot API입니다.
 
-개발 및 커밋 규칙은 [`CONTRIBUTING.md`](CONTRIBUTING.md)를 참고하세요.
+개발 및 커밋 규칙은 [`CONTRIBUTING.md`](CONTRIBUTING.md), Codex 역할 분배와 병렬 작업 규칙은
+[`AGENTS.md`](AGENTS.md)와 [`docs/agent-team.md`](docs/agent-team.md)를 참고하세요.
 
 > InvestLens의 영향 방향과 점수는 투자 조언이나 주가 예측이 아닙니다.
 
